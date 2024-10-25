@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DanLov • AI Juridisk Assistent</title>
     <style>
-        /* CSS variables */
         :root {
             --bg-color: #0A0A0B;
             --text-color: #ffffff;
@@ -114,126 +113,140 @@
             margin-bottom: 2rem;
         }
 
-        /* Pricing Section */
-        .pricing-section {
+        .product-preview {
+            margin: 4rem auto;
+            max-width: 1200px;
+            padding: 0 2rem;
+        }
+
+        .preview-container {
+            width: 100%;
+            height: 600px;
+            background: var(--card-bg);
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .chat-interface {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            padding: 2rem;
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .message {
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-radius: 8px;
+            max-width: 80%;
+        }
+
+        .message.ai {
+            background: rgba(37, 99, 235, 0.1);
+            margin-right: auto;
+        }
+
+        .message.user {
+            background: rgba(255, 255, 255, 0.1);
+            margin-left: auto;
+        }
+
+        .chat-input {
+            display: flex;
+            gap: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .chat-input input {
+            flex: 1;
+            padding: 1rem;
+            border-radius: 6px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.05);
+            color: white;
+        }
+
+        .stats-section {
             padding: 4rem 2rem;
             text-align: center;
-            background-color: var(--bg-color);
-            color: var(--text-color);
         }
 
-        .pricing-header {
-            font-size: 3rem;
-            margin-bottom: 1rem;
-        }
-
-        .pricing-description {
-            color: var(--secondary-text);
-            margin-bottom: 2rem;
-        }
-
-        .pricing-toggle {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 1rem;
-            margin: 2rem 0;
-        }
-
-        .pricing-container {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
             gap: 2rem;
             max-width: 1200px;
             margin: 0 auto;
         }
 
-        .pricing-card {
+        .stat-card {
             background: var(--card-bg);
-            border-radius: 12px;
             padding: 2rem;
-            min-width: 250px;
-            flex: 1;
-            transition: transform 0.2s;
-            color: white;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
-        .pricing-card:hover {
+        .stat-number {
+            font-size: 3rem;
+            font-weight: 700;
+            color: var(--accent-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .features {
+            padding: 4rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .feature-card {
+            background: var(--card-bg);
+            padding: 2rem;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .feature-card:hover {
             transform: translateY(-5px);
+            border-color: var(--accent-color);
         }
 
-        .pricing-plan {
+        .feature-card h3 {
             font-size: 1.5rem;
-            font-weight: bold;
-            margin-bottom: 1rem;
-        }
-
-        .pricing-cost {
-            font-size: 2rem;
-            font-weight: bold;
             margin-bottom: 1rem;
             color: var(--accent-color);
         }
 
-        .plan-billing-info {
+        footer {
+            text-align: center;
+            padding: 4rem 2rem;
             color: var(--secondary-text);
-            margin-bottom: 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
         }
 
-        .plan-features {
-            list-style: none;
-            padding-left: 0;
-            color: var(--secondary-text);
-        }
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
 
-        .plan-features li {
-            margin-bottom: 0.5rem;
-        }
-
-        .toggle-switch {
-            position: relative;
-            display: inline-block;
-            width: 50px;
-            height: 24px;
-        }
-
-        .toggle-switch input {
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
-
-        .slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: #333;
-            transition: .4s;
-            border-radius: 24px;
-        }
-
-        .slider:before {
-            position: absolute;
-            content: "";
-            height: 20px;
-            width: 20px;
-            left: 2px;
-            bottom: 2px;
-            background-color: white;
-            transition: .4s;
-            border-radius: 50%;
-        }
-
-        input:checked + .slider {
-            background-color: #5555ff;
-        }
-
-        input:checked + .slider:before {
-            transform: translateX(26px);
+            .hero h1 {
+                font-size: 2.5rem;
+            }
         }
     </style>
 </head>
@@ -242,7 +255,7 @@
         <div class="nav-logo">DanLov</div>
         <div class="nav-links">
             <a href="#">Funktioner</a>
-            <a href="#pricing">Priser</a>
+            <a href="pricing.html">Priser</a>
             <a href="#">Om Os</a>
             <a href="#">Support</a>
             <a href="#">Blog</a>
@@ -260,50 +273,58 @@
             <button class="btn btn-primary">Start 14 dages gratis prøveperiode</button>
         </section>
 
-        <section id="pricing" class="pricing-section">
-            <h2 class="pricing-header">Priser</h2>
-            <p class="pricing-description">Vælg en plan, der passer til dine behov og få adgang til præcise, AI-drevne juridiske svar.</p>
-            <div class="pricing-toggle">
-                <span>Månedligt</span>
-                <label class="toggle-switch">
-                    <input type="checkbox">
-                    <span class="slider"></span>
-                </label>
-                <span>Årligt</span>
+        <section class="product-preview">
+            <div class="preview-container">
+                <div class="chat-interface">
+                    <div class="chat-messages">
+                        <div class="message ai">
+                            Hej! Jeg er din juridiske assistent. Hvordan kan jeg hjælpe dig i dag?
+                        </div>
+                        <div class="message user">
+                            Hvad er reglerne for opsigelse af en lejekontrakt?
+                        </div>
+                        <div class="message ai">
+                            Ifølge Lejeloven § 86 skal en lejer give 3 måneders varsel ved opsigelse. Dog kan der være særlige betingelser i din kontrakt. Vil du have flere detaljer om specifikke forhold?
+                        </div>
+                    </div>
+                    <div class="chat-input">
+                        <input type="text" placeholder="Skriv dit juridiske spørgsmål her...">
+                        <button class="btn btn-primary">Send</button>
+                    </div>
+                </div>
             </div>
-            <div class="pricing-container">
-                <div class="pricing-card">
-                    <div class="pricing-plan">Gratis</div>
-                    <div class="pricing-cost">0 DKK</div>
-                    <div class="plan-billing-info">For alle brugere</div>
-                    <ul class="plan-features">
-                        <li>Ubegrænsede medlemmer</li>
-                        <li>2 Teams</li>
-                        <li>250 juridiske spørgsmål</li>
-                        <li>Integration med Slack og API-adgang</li>
-                    </ul>
+        </section>
+
+        <section class="stats-section">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number">50.000+</div>
+                    <div>Besvarede Spørgsmål</div>
                 </div>
-                <div class="pricing-card">
-                    <div class="pricing-plan">Basis</div>
-                    <div class="pricing-cost">49 DKK<span class="discount-badge">-10%</span></div>
-                    <div class="plan-billing-info">Pr. bruger/måned, faktureret årligt</div>
-                    <ul class="plan-features">
-                        <li>Alle funktioner fra Gratis-planen</li>
-                        <li>5 Teams</li>
-                        <li>Ubegrænset juridisk assistance</li>
-                        <li>Admin-roller</li>
-                    </ul>
+                <div class="stat-card">
+                    <div class="stat-number">99,9%</div>
+                    <div>Nøjagtighed</div>
                 </div>
-                <div class="pricing-card">
-                    <div class="pricing-plan">Erhverv</div>
-                    <div class="pricing-cost">79 DKK<span class="discount-badge">-15%</span></div>
-                    <div class="plan-billing-info">Pr. bruger/måned, faktureret årligt</div>
-                    <ul class="plan-features">
-                        <li>Alle funktioner fra Basis-planen</li>
-                        <li>Ubegrænsede Teams</li>
-                        <li>Privat juridisk rådgivning</li>
-                        <li>GDPR og datasikkerhed</li>
-                    </ul>
+                <div class="stat-card">
+                    <div class="stat-number">2.000+</div>
+                    <div>Aktive Brugere</div>
+                </div>
+            </div>
+        </section>
+
+        <section class="features">
+            <div class="features-grid">
+                <div class="feature-card">
+                    <h3>⚖️ Præcise Lovhenvisninger</h3>
+                    <p>Få svar med direkte referencer til relevant lovgivning, retspraksis og juridiske vejledninger.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>🔄 Altid Opdateret</h3>
+                    <p>Vores system opdateres løbende med den nyeste lovgivning og retspraksis.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>🔒 GDPR-Compliant</h3>
+                    <p>Alle data behandles i overensstemmelse med dansk og europæisk persondatalovgivning.</p>
                 </div>
             </div>
         </section>
