@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DanLov • Priser</title>
+    <style>
+        :root {
+            --bg-color: #0A0A0B;
+            --text-color: #ffffff;
+            --secondary-text: rgba(255, 255, 255, 0.7);
+            --accent-color: #2563eb;
+            --card-bg: #111111;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.5;
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem 2rem;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            background: rgba(10, 10, 11, 0.8);
+            backdrop-filter: blur(10px);
+            z-index: 100;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            color: var(--secondary-text);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: color 0.2s;
+        }
+
+        .nav-links a:hover {
+            color: var(--text-color);
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn {
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: var(--accent-color);
+            color: white;
+            border: none;
+        }
+
+        .btn-primary:hover {
+            background: #1d4ed8;
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: none;
+        }
+
+        .pricing-section {
+            padding: 4rem 2rem;
+            text-align: center;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+        }
+
+        .pricing-header {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .pricing-description {
+            color: var(--secondary-text);
+            margin-bottom: 2rem;
+        }
+
+        .pricing-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+
+        .pricing-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .pricing-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 2rem;
+            min-width: 250px;
+            flex: 1;
+            transition: transform 0.2s;
+            color: white;
+        }
+
+        .pricing-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .pricing-plan {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+        }
+
+        .pricing-cost {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+            color: var(--accent-color);
+        }
+
+        .plan-billing-info {
+            color: var(--secondary-text);
+            margin-bottom: 2rem;
+        }
+
+        .plan-features {
+            list-style: none;
+            padding-left: 0;
+            color: var(--secondary-text);
+        }
+
+        .plan-features li {
+            margin-bottom: 0.5rem;
+        }
+
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #333;
+            transition: .4s;
+            border-radius: 24px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 20px;
+            width: 20px;
+            left: 2px;
+            bottom: 2px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: #5555ff;
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+
+        footer {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: var(--secondary-text);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="nav-logo">DanLov</div>
+        <div class="nav-links">
+            <a href="index.html">Forside</a>
+            <a href="#">Funktioner</a>
+            <a href="pricing.html">Priser</a>
+            <a href="#">Om Os</a>
+            <a href="#">Support</a>
+            <a href="#">Blog</a>
+        </div>
+        <div class="nav-buttons">
+            <button class="btn btn-secondary">Log ind</button>
+            <button class="btn btn-primary">Prøv gratis</button>
+        </div>
+    </nav>
+
+    <main>
+        <section class="pricing-section">
+            <h2 class="pricing-header">Priser</h2>
+            <p class="pricing-description">Vælg en plan, der passer til dine behov og få adgang til præcise, AI-drevne juridiske svar.</p>
+            <div class="pricing-toggle">
+                <span>Månedligt</span>
+                <label class="toggle-switch">
+                    <input type="checkbox">
+                    <span class="slider"></span>
+                </label>
+                <span>Årligt</span>
+            </div>
+            <div class="pricing-container">
+                <div class="pricing-card">
+                    <h3 class="pricing-plan">Gratis</h3>
+                    <p class="pricing-cost">0 DKK</p>
+                    <div class="plan-billing-info">For alle brugere</div>
+                    <ul class="plan-features">
+                        <li>Ubegrænsede medlemmer</li>
+                        <li>2 Teams</li>
+                        <li>250 juridiske spørgsmål</li>
+                        <li>Integration med Slack og API-adgang</li>
+                    </ul>
+                </div>
+                <div class="pricing-card">
+                    <h3 class="pricing-plan">Basis</h3>
+                    <p class="pricing-cost">49 DKK<span class="discount-badge">-10%</span></p>
+                    <div class="plan-billing-info">Pr. bruger/måned, faktureret årligt</div>
+                    <ul class="plan-features">
+                        <li>Alle funktioner fra Gratis-planen</li>
+                        <li>5 Teams</li>
+                        <li>Ubegrænset juridisk assistance</li>
+                        <li>Admin-roller</li>
+                    </ul>
+                </div>
+                <div class="pricing-card">
+                    <h3 class="pricing-plan">Erhverv</h3>
+                    <p class="pricing-cost">79 DKK<span class="discount-badge">-15%</span></p>
+                    <div class="plan-billing-info">Pr. bruger/måned, faktureret årligt</div>
+                    <ul class="plan-features">
+                        <li>Alle funktioner fra Basis-planen</li>
+                        <li>Ubegrænsede Teams</li>
+                        <li>Privat juridisk rådgivning</li>
+                        <li>GDPR og datasikkerhed</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>© 2024 DanLov • Udviklet i Danmark 🇩🇰</p>
+    </footer>
+</body>
+</html>
