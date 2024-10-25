@@ -6,11 +6,13 @@
     <title>DanLov • Priser</title>
     <style>
         :root {
-            --bg-color: #0A0A0B;
+            --bg-color: #000000;
             --text-color: #ffffff;
-            --secondary-text: rgba(255, 255, 255, 0.7);
-            --accent-color: #2563eb;
+            --secondary-text: #999999;
             --card-bg: #111111;
+            --card-hover: #1a1a1a;
+            --border-color: #333333;
+            --accent-blue: #5555ff;
         }
 
         * {
@@ -23,20 +25,25 @@
         body {
             background-color: var(--bg-color);
             color: var(--text-color);
-            line-height: 1.5;
+            min-height: 100vh;
         }
 
         nav {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 1.5rem 2rem;
-            position: fixed;
-            width: 100%;
-            top: 0;
-            background: rgba(10, 10, 11, 0.8);
+            padding: 1rem 2rem;
+            background-color: rgba(0, 0, 0, 0.9);
+            border-bottom: 1px solid var(--border-color);
             backdrop-filter: blur(10px);
+            position: sticky;
+            top: 0;
             z-index: 100;
+        }
+
+        .nav-logo {
+            font-weight: bold;
+            font-size: 1.2rem;
         }
 
         .nav-links {
@@ -62,44 +69,48 @@
 
         .btn {
             padding: 0.5rem 1rem;
-            border-radius: 6px;
+            border-radius: 0.5rem;
             font-size: 0.9rem;
             cursor: pointer;
             transition: all 0.2s;
-        }
-
-        .btn-primary {
-            background: var(--accent-color);
-            color: white;
             border: none;
         }
 
+        .btn-primary {
+            background-color: var(--text-color);
+            color: var(--bg-color);
+        }
+
         .btn-primary:hover {
-            background: #1d4ed8;
+            opacity: 0.9;
             transform: translateY(-1px);
         }
 
         .btn-secondary {
-            background: rgba(255, 255, 255, 0.1);
-            color: white;
-            border: none;
+            background-color: transparent;
+            color: var(--text-color);
+        }
+
+        .btn-secondary:hover {
+            background-color: rgba(255, 255, 255, 0.1);
         }
 
         .pricing-section {
-            padding: 4rem 2rem;
+            padding: 6rem 2rem 4rem;
             text-align: center;
-            background-color: var(--bg-color);
-            color: var(--text-color);
         }
 
         .pricing-header {
             font-size: 3rem;
             margin-bottom: 1rem;
+            font-weight: 600;
         }
 
         .pricing-description {
             color: var(--secondary-text);
-            margin-bottom: 2rem;
+            max-width: 600px;
+            margin: 0 auto 3rem;
+            line-height: 1.6;
         }
 
         .pricing-toggle {
@@ -108,57 +119,7 @@
             justify-content: center;
             gap: 1rem;
             margin: 2rem 0;
-        }
-
-        .pricing-container {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 2rem;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        .pricing-card {
-            background: var(--card-bg);
-            border-radius: 12px;
-            padding: 2rem;
-            min-width: 250px;
-            flex: 1;
-            transition: transform 0.2s;
-            color: white;
-        }
-
-        .pricing-card:hover {
-            transform: translateY(-5px);
-        }
-
-        .pricing-plan {
-            font-size: 1.5rem;
-            font-weight: bold;
-            margin-bottom: 1rem;
-        }
-
-        .pricing-cost {
-            font-size: 2rem;
-            font-weight: bold;
-            margin-bottom: 1rem;
-            color: var(--accent-color);
-        }
-
-        .plan-billing-info {
             color: var(--secondary-text);
-            margin-bottom: 2rem;
-        }
-
-        .plan-features {
-            list-style: none;
-            padding-left: 0;
-            color: var(--secondary-text);
-        }
-
-        .plan-features li {
-            margin-bottom: 0.5rem;
         }
 
         .toggle-switch {
@@ -199,18 +160,109 @@
         }
 
         input:checked + .slider {
-            background-color: #5555ff;
+            background-color: var(--accent-blue);
         }
 
         input:checked + .slider:before {
             transform: translateX(26px);
         }
 
+        .pricing-container {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .pricing-card {
+            background: var(--card-bg);
+            border-radius: 1rem;
+            padding: 2rem;
+            min-width: 280px;
+            flex: 1;
+            transition: all 0.2s ease;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .pricing-card:hover {
+            transform: translateY(-5px);
+            background: var(--card-hover);
+        }
+
+        .pricing-plan {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: var(--text-color);
+        }
+
+        .pricing-cost {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            gap: 0.5rem;
+        }
+
+        .discount-badge {
+            background-color: rgba(85, 85, 255, 0.2);
+            color: var(--accent-blue);
+            padding: 0.2rem 0.5rem;
+            border-radius: 0.3rem;
+            font-size: 0.8rem;
+        }
+
+        .plan-billing-info {
+            color: var(--secondary-text);
+            font-size: 0.9rem;
+            margin-bottom: 2rem;
+        }
+
+        .plan-features {
+            list-style: none;
+            text-align: left;
+            flex-grow: 1;
+            margin-bottom: 2rem;
+        }
+
+        .plan-features li {
+            color: var(--secondary-text);
+            margin-bottom: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .plan-features li::before {
+            content: "✓";
+            color: var(--text-color);
+        }
+
         footer {
             text-align: center;
-            padding: 4rem 2rem;
+            padding: 3rem 2rem;
             color: var(--secondary-text);
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            border-top: 1px solid var(--border-color);
+            margin-top: 4rem;
+        }
+
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+
+            .pricing-card {
+                min-width: 100%;
+            }
+
+            .pricing-header {
+                font-size: 2.5rem;
+            }
         }
     </style>
 </head>
@@ -235,14 +287,16 @@
         <section class="pricing-section">
             <h2 class="pricing-header">Priser</h2>
             <p class="pricing-description">Vælg en plan, der passer til dine behov og få adgang til præcise, AI-drevne juridiske svar.</p>
+            
             <div class="pricing-toggle">
                 <span>Månedligt</span>
                 <label class="toggle-switch">
-                    <input type="checkbox">
+                    <input type="checkbox" checked>
                     <span class="slider"></span>
                 </label>
                 <span>Årligt</span>
             </div>
+
             <div class="pricing-container">
                 <div class="pricing-card">
                     <h3 class="pricing-plan">Gratis</h3>
@@ -254,7 +308,9 @@
                         <li>250 juridiske spørgsmål</li>
                         <li>Integration med Slack og API-adgang</li>
                     </ul>
+                    <button class="btn btn-primary">Kom i gang</button>
                 </div>
+
                 <div class="pricing-card">
                     <h3 class="pricing-plan">Basis</h3>
                     <p class="pricing-cost">49 DKK<span class="discount-badge">-10%</span></p>
@@ -265,8 +321,10 @@
                         <li>Ubegrænset juridisk assistance</li>
                         <li>Admin-roller</li>
                     </ul>
+                    <button class="btn btn-primary">Vælg Basis</button>
                 </div>
-                <div class="pricing-card">
+
+                <div class="pricing-card" style="background: #1a1a1a;">
                     <h3 class="pricing-plan">Erhverv</h3>
                     <p class="pricing-cost">79 DKK<span class="discount-badge">-15%</span></p>
                     <div class="plan-billing-info">Pr. bruger/måned, faktureret årligt</div>
@@ -276,6 +334,7 @@
                         <li>Privat juridisk rådgivning</li>
                         <li>GDPR og datasikkerhed</li>
                     </ul>
+                    <button class="btn btn-primary">Vælg Erhverv</button>
                 </div>
             </div>
         </section>
