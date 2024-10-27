@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DanLov • AI Juridisk Assistent</title>
+    <style>
+        :root {
+            --bg-color: #000000;
+            --text-color: #ffffff;
+            --secondary-text: rgba(255, 255, 255, 0.7);
+            --accent-color: #5E6AD2;
+            --card-bg: #111111;
+            --gradient-start: rgba(255, 255, 255, 0.1);
+            --gradient-end: rgba(255, 255, 255, 0.03);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.5;
+            overflow-x: hidden;
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem 2rem;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            z-index: 100;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-logo {
+            font-weight: 600;
+            font-size: 1.25rem;
+            background: linear-gradient(to right, #fff, rgba(255, 255, 255, 0.7));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .nav-links a {
+            color: var(--secondary-text);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: color 0.2s;
+        }
+
+        .btn {
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+
+        .btn-primary {
+            background: var(--accent-color);
+            color: white;
+            border: none;
+        }
+
+        .btn-primary:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: none;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .hero {
+            padding: 12rem 2rem 6rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .hero h1 {
+            font-size: 4.5rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            line-height: 1.1;
+            background: linear-gradient(to right, #ffffff, #e2e8f0);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero p {
+            font-size: 1.25rem;
+            color: var(--secondary-text);
+            max-width: 600px;
+            margin: 0 auto 2rem;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-bottom: 4rem;
+        }
+
+        .product-preview {
+            margin: 4rem auto;
+            max-width: 1000px;
+            padding: 0 2rem;
+        }
+
+        .preview-container {
+            width: 100%;
+            height: 500px;
+            background: linear-gradient(to bottom, var(--gradient-start), var(--gradient-end));
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .chat-interface {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            padding: 2rem;
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .message {
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-radius: 8px;
+            max-width: 80%;
+            line-height: 1.6;
+        }
+
+        .message.ai {
+            background: rgba(94, 106, 210, 0.1);
+            margin-right: auto;
+        }
+
+        .message.user {
+            background: rgba(255, 255, 255, 0.1);
+            margin-left: auto;
+        }
+
+        .chat-input {
+            display: flex;
+            gap: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .chat-input input {
+            flex: 1;
+            padding: 1rem;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.05);
+            color: white;
+        }
+
+        .features {
+            padding: 6rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .feature-card {
+            background: linear-gradient(to bottom, var(--gradient-start), var(--gradient-end));
+            padding: 2rem;
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .feature-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: var(--text-color);
+        }
+
+        footer {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: var(--secondary-text);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+            
+            .hero-buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="nav-logo">DanLov</div>
+        <div class="nav-buttons">
+            <button class="btn btn-secondary" onclick="window.location.href='chat.html'">Log ind</button>
+            <button class="btn btn-primary">Opret Konto</button>
+        </div>
+    </nav>
+
+    <main>
+        <section class="hero">
+            <h1>Juridisk klarhed på sekunder</h1>
+            <p>Din AI-drevne juridiske assistent med direkte adgang til dansk lovgivning og retspraksis.</p>
+            <div class="hero-buttons">
+                <button class="btn btn-primary">Opret din Konto</button>
+                <button class="btn btn-secondary" onclick="window.location.href='pricing.html'">Se priser</button>
+            </div>
+        </section>
+
+        <section class="product-preview">
+            <div class="preview-container">
+                <div class="chat-interface">
+                    <div class="chat-messages">
+                        <div class="message ai">
+                            Velkommen! Hvad kan jeg hjælpe dig med i dag?
+                        </div>
+                        <div class="message user">
+                            Jeg har brug for at oprette en kontrakt hurtigt, kan du hjælpe?
+                        </div>
+                        <div class="message ai">
+                            Selvfølgelig! Jeg kan generere en skræddersyet kontrakt til dig på få minutter, hvilken slags kontrakt har du brug for?
+                        </div>
+                    </div>
+                    <div class="chat-input">
+                        <input type="text" placeholder="Stil dit juridiske spørgsmål...">
+                        <button class="btn btn-primary">Send</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="features">
+            <div class="features-grid">
+                <div class="feature-card">
+                    <h3>⚖️ Præcise svar</h3>
+                    <p>Direkte referencer til lovgivning og retspraksis på sekunder.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>🔄 Altid opdateret</h3>
+                    <p>Automatisk opdatering med den nyeste lovgivning.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>🔒 GDPR-compliant</h3>
+                    <p>Sikker databehandling efter danske og EU-standarder.</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>© 2024 DanLov • Udviklet i Danmark 🇩🇰</p>
+    </footer>
+</body>
+</html>

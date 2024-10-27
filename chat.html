@@ -1,0 +1,893 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="DanLov juridisk chat interface - Få øjeblikkelig juridisk assistance og rådgivning">
+    <title>DanLov • Juridisk Assistance</title>
+    <style>
+        :root {
+            --bg-color: #0A0A0B;
+            --text-color: #ffffff;
+            --secondary-text: rgba(255, 255, 255, 0.7);
+            --accent-color: #2563eb;
+            --accent-color-hover: #1d4ed8;
+            --accent-light: rgba(37, 99, 235, 0.2);
+            --card-bg: #111111;
+            --success-color: #10B981;
+            --error-color: #EF4444;
+            --gradient-start: rgba(255, 255, 255, 0.1);
+            --gradient-end: rgba(255, 255, 255, 0.03);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(-20px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        @keyframes pulse {
+            0% { opacity: 0.4; }
+            50% { opacity: 0.8; }
+            100% { opacity: 0.4; }
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 1.5rem;
+            background: rgba(10, 10, 11, 0.8);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-logo {
+            font-weight: 600;
+            font-size: 1.25rem;
+            background: linear-gradient(45deg, #fff, var(--accent-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-logo::before {
+            content: "⚖️";
+            font-size: 1.5rem;
+        }
+
+        .main-container {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .cases-sidebar {
+            width: 320px;
+            background: var(--card-bg);
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 1.25rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+            overflow-y: auto;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        .sidebar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .sidebar-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--secondary-text);
+        }
+
+        .case-item {
+            padding: 1rem 1.25rem;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid transparent;
+        }
+
+        .case-item:hover {
+            background: rgba(255, 255, 255, 0.08);
+            transform: translateY(-1px);
+        }
+
+        .case-item.active {
+            background: var(--accent-light);
+            border-color: var(--accent-color);
+        }
+
+        .case-title {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--text-color);
+        }
+
+        .case-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.85rem;
+            color: var(--secondary-text);
+        }
+
+        .case-date {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .case-date::before {
+            content: "🗓️";
+            font-size: 0.9rem;
+        }
+
+        .case-status {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--success-color);
+        }
+
+        .chat-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 1.5rem;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            padding-right: 1rem;
+        }
+
+        .message {
+            padding: 1rem 1.25rem;
+            border-radius: 16px;
+            max-width: 85%;
+            white-space: pre-wrap;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            animation: fadeIn 0.3s ease-out;
+            position: relative;
+        }
+
+        .message.assistant {
+            background: linear-gradient(to right, var(--accent-light), rgba(37, 99, 235, 0.1));
+            margin-right: auto;
+            border-bottom-left-radius: 4px;
+        }
+
+        .message.user {
+            background: rgba(255, 255, 255, 0.08);
+            margin-left: auto;
+            border-bottom-right-radius: 4px;
+        }
+
+        .message.loading {
+            color: var(--secondary-text);
+            animation: pulse 1.5s infinite ease-in-out;
+        }
+
+        .message.loading::after {
+            content: "...";
+            animation: dotAnimation 1.5s infinite;
+        }
+
+        @keyframes dotAnimation {
+            0% { content: "."; }
+            33% { content: ".."; }
+            66% { content: "..."; }
+            100% { content: "."; }
+        }
+
+        .message h1, .message h2, .message h3 {
+            margin: 1rem 0 0.5rem;
+            color: var(--text-color);
+        }
+
+        .message p {
+            margin-bottom: 0.75rem;
+        }
+
+        .message ul, .message ol {
+            margin: 0.5rem 0;
+            padding-left: 1.5rem;
+        }
+
+        .message code {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+            font-family: monospace;
+        }
+
+        .chat-input-container {
+            padding: 1.25rem;
+            background: var(--card-bg);
+            border-radius: 16px;
+            margin-top: 1rem;
+            position: sticky;
+            bottom: 1rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .chat-input-wrap {
+            display: flex;
+            gap: 1rem;
+            align-items: flex-end;
+        }
+
+        .chat-input {
+            flex: 1;
+            padding: 0.875rem 1.25rem;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.05);
+            color: white;
+            font-size: 0.95rem;
+            resize: none;
+            min-height: 48px;
+            max-height: 200px;
+            transition: all 0.3s ease;
+        }
+
+        .chat-input:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .btn {
+            padding: 0.875rem 1.25rem;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            font-weight: 500;
+        }
+
+        .btn-primary {
+            background: var(--accent-color);
+            color: white;
+            border: none;
+            min-width: 100px;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+        }
+
+        .btn-primary:hover {
+            background: var(--accent-color-hover);
+            transform: translateY(-1px);
+            box-shadow: 0 6px 16px rgba(37, 99, 235, 0.3);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.08);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.12);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-icon {
+            width: 48px;
+            padding: 0;
+            justify-content: center;
+        }
+
+        .no-case-selected {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            color: var(--secondary-text);
+            text-align: center;
+            padding: 2rem;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .no-case-icon {
+            font-size: 3rem;
+            margin-bottom: 1.5rem;
+            color: var(--accent-color);
+        }
+
+        .no-case-selected h2 {
+            margin-bottom: 1rem;
+            color: var(--text-color);
+        }
+
+        .no-case-selected p {
+            max-width: 400px;
+            margin-bottom: 2rem;
+        }
+
+        .typing-indicator {
+            display: flex;
+            gap: 0.5rem;
+            padding: 0.5rem;
+            color: var(--secondary-text);
+            font-size: 0.9rem;
+            align-items: center;
+        }
+
+        .typing-dots {
+            display: flex;
+            gap: 0.25rem;
+        }
+
+        .typing-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--accent-color);
+            animation: typingAnimation 1.4s infinite;
+            opacity: 0.6;
+        }
+
+        .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes typingAnimation {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-4px); }
+        }
+
+        @media (max-width: 768px) {
+            .cases-sidebar {
+                position: absolute;
+                left: 0;
+                top: 0;
+                bottom: 0;
+                z-index: 90;
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+            }
+
+            .cases-sidebar.active {
+                transform: translateX(0);
+            }
+
+            .sidebar-toggle {
+                display: block;
+                position: absolute;
+                right: -40px;
+                top: 50%;
+                transform: translateY(-50%);
+                background: var(--accent-color);
+                border: none;
+                color: white;
+                width: 40px;
+                height: 40px;
+                border-radius: 0 8px 8px 0;
+                cursor: pointer;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="nav-logo">DanLov</div>
+        <button onclick="window.location.href='index.html'" class="btn btn-secondary">
+            <span>←</span> Tilbage til forside
+        </button>
+    </nav>
+
+    <div class="main-container">
+        <aside class="cases-sidebar" id="cases-sidebar">
+            <button class="sidebar-toggle" id="sidebar-toggle">☰</button>
+            <div class="sidebar-header">
+                <h2 class="sidebar-title">Dine Sager</h2>
+                <button class="btn btn-icon btn-secondary" title="Filtrer sager">
+                    ⚡
+                </button>
+            </div>
+            <button onclick="createNewCase()" class="btn btn-primary">
+                <span>+</span> Ny Sag
+            </button>
+            <div id="cases-list"></div>
+        </aside>
+
+        <main class="chat-container">
+            <div id="no-case-selected" class="no-case-selected">
+                <div class="no-case-icon">📋</div>
+                <h2>Ingen sag valgt</h2>
+                <p>Vælg en eksisterende sag fra sidepanelet eller opret en ny sag for at starte en juridisk samtale</p>
+                <button onclick="createNewCase()" class="btn btn-primary">
+                    <span>+</span> Opret Ny Sag
+                </button>
+            </div>
+            <div id="chat-interface" style="display: none; height: 100%; flex-direction: column;">
+                <div class="chat-messages" id="chat-messages"></div>
+                <div class="chat-input-container">
+                    <div class="chat-input-wrap">
+                        <textarea 
+                        id="chat-input" 
+                        class="chat-input" 
+                        placeholder="Skriv dit juridiske spørgsmål her... (Tryk Enter for at sende)"
+                        rows="1"
+                        onkeydown="handleKeyPress(event)"
+                    ></textarea>
+                        <button onclick="sendMessage()" class="btn btn-primary">
+                            Send <span>→</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        let cases = JSON.parse(localStorage.getItem('cases')) || [];
+        let currentCaseId = null;
+        let isTyping = false;
+
+        function createNewCase() {
+            const caseTitle = prompt('Indtast sagsoverskrift:');
+            if (!caseTitle) return;
+
+            const newCase = {
+                id: Date.now(),
+                title: caseTitle,
+                date: new Date().toISOString(),
+                status: 'active',
+                messages: [{
+                    role: 'assistant',
+                    content: `Velkommen til din nye sag "${caseTitle}"! 👋\n\nJeg er din juridiske assistent, og jeg er her for at hjælpe dig med at navigere gennem danske love og regler. Du kan spørge mig om alt fra kontraktret og selskabsret til arbejdsret og meget mere.\n\nHvordan kan jeg hjælpe dig i dag?`
+                }]
+            };
+
+            cases.push(newCase);
+            saveAndRenderCases();
+            selectCase(newCase.id);
+        }
+
+        function saveAndRenderCases() {
+            localStorage.setItem('cases', JSON.stringify(cases));
+            renderCases();
+        }
+
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            const today = new Date();
+            const yesterday = new Date(today);
+            yesterday.setDate(yesterday.getDate() - 1);
+
+            if (date.toDateString() === today.toDateString()) {
+                return 'I dag';
+            } else if (date.toDateString() === yesterday.toDateString()) {
+                return 'I går';
+            }
+            return date.toLocaleDateString('da-DK', {
+                day: 'numeric',
+                month: 'short'
+            });
+        }
+
+        function renderCases() {
+            const casesList = document.getElementById('cases-list');
+            casesList.innerHTML = cases
+                .sort((a, b) => new Date(b.date) - new Date(a.date))
+                .map(case_ => `
+                    <div class="case-item ${case_.id === currentCaseId ? 'active' : ''}" 
+                         onclick="selectCase(${case_.id})">
+                        <div class="case-title">${case_.title}</div>
+                        <div class="case-meta">
+                            <div class="case-date">
+                                ${formatDate(case_.date)}
+                            </div>
+                            <div class="case-status">
+                                <span class="status-dot"></span>
+                                ${case_.status === 'active' ? 'Aktiv' : 'Afsluttet'}
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+        }
+
+        function selectCase(caseId) {
+            currentCaseId = caseId;
+            const selectedCase = cases.find(c => c.id === caseId);
+            
+            document.getElementById('no-case-selected').style.display = 'none';
+            document.getElementById('chat-interface').style.display = 'flex';
+            
+            const chatMessages = document.getElementById('chat-messages');
+            chatMessages.innerHTML = '';
+            
+            selectedCase.messages.forEach(msg => {
+                addMessage(msg.role, msg.content);
+            });
+            
+            renderCases();
+
+            // Close sidebar on mobile after selecting a case
+            if (window.innerWidth <= 768) {
+                document.getElementById('cases-sidebar').classList.remove('active');
+            }
+        }
+
+        function addMessage(role, content, isLoading = false) {
+            const messagesContainer = document.getElementById('chat-messages');
+            const messageDiv = document.createElement('div');
+            const id = Date.now().toString();
+
+            let formattedContent = isLoading ? content : content
+                .replace(/### (.+)/g, '<h3>$1</h3>')
+                .replace(/## (.+)/g, '<h2>$1</h2>')
+                .replace(/# (.+)/g, '<h1>$1</h1>')
+                .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+                .replace(/\*(.+?)\*/g, '<em>$1</em>')
+                .replace(/`(.+?)`/g, '<code>$1</code>')
+                .replace(/\n\n/g, '</p><p>')
+                .replace(/\n/g, '<br>');
+
+            if (!isLoading) {
+                formattedContent = `<p>${formattedContent}</p>`;
+            }
+
+            messageDiv.id = id;
+            messageDiv.className = `message ${role}${isLoading ? ' loading' : ''}`;
+            messageDiv.innerHTML = formattedContent;
+
+            messagesContainer.appendChild(messageDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+            return id;
+        }
+
+        function removeMessage(id) {
+            const message = document.getElementById(id);
+            if (message) message.remove();
+        }
+
+        async function sendMessage() {
+            if (!currentCaseId || isTyping) return;
+            
+            const chatInput = document.getElementById('chat-input');
+            const message = chatInput.value.trim();
+            if (!message) return;
+
+            const currentCase = cases.find(c => c.id === currentCaseId);
+            if (!currentCase) return;
+
+            // Add user message
+            currentCase.messages.push({ role: 'user', content: message });
+            addMessage('user', message);
+            chatInput.value = '';
+            chatInput.style.height = 'auto';
+
+            isTyping = true;
+            const loadingId = addMessage('assistant', 'Tænker og formulerer svar', true);
+
+            try {
+                const response = await fetch('http://localhost:3000/chat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        messages: currentCase.messages
+                    }),
+                });
+
+                const data = await response.json();
+                removeMessage(loadingId);
+                
+                // Add assistant message
+                currentCase.messages.push({ role: 'assistant', content: data.content });
+                addMessage('assistant', data.content);
+                
+                // Update case date
+                currentCase.date = new Date().toISOString();
+                
+                // Save updated cases
+                saveAndRenderCases();
+            } catch (error) {
+                removeMessage(loadingId);
+                addMessage('assistant', 'Beklager, der opstod en fejl. Prøv venligst igen.');
+            } finally {
+                isTyping = false;
+            }
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault();
+                sendMessage();
+            }
+        }
+
+        // Auto-resize textarea
+        document.getElementById('chat-input').addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = Math.min(200, this.scrollHeight) + 'px';
+        });
+
+        // Mobile sidebar toggle
+        document.getElementById('sidebar-toggle')?.addEventListener('click', function() {
+            document.getElementById('cases-sidebar').classList.toggle('active');
+        });
+
+        // Initialize
+        renderCases();
+
+        // Close sidebar when clicking outside on mobile
+        document.addEventListener('click', function(event) {
+            const sidebar = document.getElementById('cases-sidebar');
+            const toggle = document.getElementById('sidebar-toggle');
+            
+            if (window.innerWidth <= 768 && 
+                !sidebar.contains(event.target) && 
+                !toggle.contains(event.target)) {
+                sidebar.classList.remove('active');
+            }
+        });
+    </script>
+</body>
+
+    <script>
+        let cases = JSON.parse(localStorage.getItem('cases')) || [];
+        let currentCaseId = null;
+        let isTyping = false;
+
+        function createNewCase() {
+            const caseTitle = prompt('Indtast sagsoverskrift:');
+            if (!caseTitle) return;
+
+            const newCase = {
+                id: Date.now(),
+                title: caseTitle,
+                date: new Date().toISOString(),
+                status: 'active',
+                messages: [{
+                    role: 'assistant',
+                    content: `Velkommen til din nye sag "${caseTitle}"! 👋\n\nJeg er din juridiske assistent, og jeg er her for at hjælpe dig med at navigere gennem danske love og regler. Du kan spørge mig om alt fra kontraktret og selskabsret til arbejdsret og meget mere.\n\nHvordan kan jeg hjælpe dig i dag?`
+                }]
+            };
+
+            cases.push(newCase);
+            saveAndRenderCases();
+            selectCase(newCase.id);
+        }
+
+        function saveAndRenderCases() {
+            localStorage.setItem('cases', JSON.stringify(cases));
+            renderCases();
+        }
+
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            const today = new Date();
+            const yesterday = new Date(today);
+            yesterday.setDate(yesterday.getDate() - 1);
+
+            if (date.toDateString() === today.toDateString()) {
+                return 'I dag';
+            } else if (date.toDateString() === yesterday.toDateString()) {
+                return 'I går';
+            }
+            return date.toLocaleDateString('da-DK', {
+                day: 'numeric',
+                month: 'short'
+            });
+        }
+
+        function renderCases() {
+            const casesList = document.getElementById('cases-list');
+            casesList.innerHTML = cases
+                .sort((a, b) => new Date(b.date) - new Date(a.date))
+                .map(case_ => `
+                    <div class="case-item ${case_.id === currentCaseId ? 'active' : ''}" 
+                         onclick="selectCase(${case_.id})">
+                        <div class="case-title">${case_.title}</div>
+                        <div class="case-meta">
+                            <div class="case-date">
+                                ${formatDate(case_.date)}
+                            </div>
+                            <div class="case-status">
+                                <span class="status-dot"></span>
+                                ${case_.status === 'active' ? 'Aktiv' : 'Afsluttet'}
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+        }
+
+        function selectCase(caseId) {
+            currentCaseId = caseId;
+            const selectedCase = cases.find(c => c.id === caseId);
+            
+            document.getElementById('no-case-selected').style.display = 'none';
+            document.getElementById('chat-interface').style.display = 'flex';
+            
+            const chatMessages = document.getElementById('chat-messages');
+            chatMessages.innerHTML = '';
+            
+            selectedCase.messages.forEach(msg => {
+                addMessage(msg.role, msg.content);
+            });
+            
+            renderCases();
+
+            // Close sidebar on mobile after selecting a case
+            if (window.innerWidth <= 768) {
+                document.getElementById('cases-sidebar').classList.remove('active');
+            }
+        }
+
+        function addMessage(role, content, isLoading = false) {
+            const messagesContainer = document.getElementById('chat-messages');
+            const messageDiv = document.createElement('div');
+            const id = Date.now().toString();
+
+            let formattedContent = isLoading ? content : content
+                .replace(/### (.+)/g, '<h3>$1</h3>')
+                .replace(/## (.+)/g, '<h2>$1</h2>')
+                .replace(/# (.+)/g, '<h1>$1</h1>')
+                .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+                .replace(/\*(.+?)\*/g, '<em>$1</em>')
+                .replace(/`(.+?)`/g, '<code>$1</code>')
+                .replace(/\n\n/g, '</p><p>')
+                .replace(/\n/g, '<br>');
+
+            if (!isLoading) {
+                formattedContent = `<p>${formattedContent}</p>`;
+            }
+
+            messageDiv.id = id;
+            messageDiv.className = `message ${role}${isLoading ? ' loading' : ''}`;
+            messageDiv.innerHTML = formattedContent;
+
+            messagesContainer.appendChild(messageDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+            return id;
+        }
+
+        function removeMessage(id) {
+            const message = document.getElementById(id);
+            if (message) message.remove();
+        }
+
+        async function sendMessage() {
+            if (!currentCaseId || isTyping) return;
+            
+            const chatInput = document.getElementById('chat-input');
+            const message = chatInput.value.trim();
+            if (!message) return;
+
+            const currentCase = cases.find(c => c.id === currentCaseId);
+            if (!currentCase) return;
+
+            // Add user message
+            currentCase.messages.push({ role: 'user', content: message });
+            addMessage('user', message);
+            chatInput.value = '';
+            chatInput.style.height = 'auto';
+
+            isTyping = true;
+            const loadingId = addMessage('assistant', 'Tænker og formulerer svar', true);
+
+            try {
+                const response = await fetch('http://localhost:3000/chat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        messages: currentCase.messages
+                    }),
+                });
+
+                const data = await response.json();
+                removeMessage(loadingId);
+                
+                // Add assistant message
+                currentCase.messages.push({ role: 'assistant', content: data.content });
+                addMessage('assistant', data.content);
+                
+                // Update case date
+                currentCase.date = new Date().toISOString();
+                
+                // Save updated cases
+                saveAndRenderCases();
+            } catch (error) {
+                removeMessage(loadingId);
+                addMessage('assistant', 'Beklager, der opstod en fejl. Prøv venligst igen.');
+            } finally {
+                isTyping = false;
+            }
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault();
+                sendMessage();
+            }
+        }
+
+        // Auto-resize textarea
+        document.getElementById('chat-input').addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = Math.min(200, this.scrollHeight) + 'px';
+        });
+
+        // Mobile sidebar toggle
+        document.getElementById('sidebar-toggle')?.addEventListener('click', function() {
+            document.getElementById('cases-sidebar').classList.toggle('active');
+        });
+
+        // Initialize
+        renderCases();
+
+        // Close sidebar when clicking outside on mobile
+        document.addEventListener('click', function(event) {
+            const sidebar = document.getElementById('cases-sidebar');
+            const toggle = document.getElementById('sidebar-toggle');
+            
+            if (window.innerWidth <= 768 && 
+                !sidebar.contains(event.target) && 
+                !toggle.contains(event.target)) {
+                sidebar.classList.remove('active');
+            }
+        });
+    </script>
+</body>
+</html>
