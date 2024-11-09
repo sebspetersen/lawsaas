@@ -1,6 +1,30 @@
 <!DOCTYPE html>
 <html lang="da">
 <head>
+    <!-- Add these in the <head> section -->
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+<script src="https://js.stripe.com/v3/"></script>
+
+<script>
+    // Firebase configuration
+    const firebaseConfig = {
+        apiKey: "AIzaSyBCzQKSufkAp1SpuTreufydl3iuA36HopQ",
+        authDomain: "jurda-5a6b2.firebaseapp.com",
+        projectId: "jurda-5a6b2",
+        storageBucket: "jurda-5a6b2.firebasestorage.app",
+        messagingSenderId: "668210342012",
+        appId: "1:668210342012:web:e4504c92aa20ef63fe01f9",
+        measurementId: "G-M6JT7LWHC1"
+    };
+
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    
+    // Initialize Stripe
+    const stripe = Stripe('pk_live_51QIqWhQO2oGbYUgyvoDOr8e16QUBLJ5n05pqGyCowFpIq2Ig3DZ1dyciamG0QqRi0gRxZyDXqbgbPpMLEBrbvpf3002BOY4w3Q');
+</script>
+    
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Gennemsigtige priser for DanLov - Din AI-drevne juridiske assistent. Vælg mellem fleksible pakker der passer til dine behov.">
@@ -379,8 +403,8 @@
     <nav>
         <div class="nav-logo" onclick="window.location.href='index.html'">DanLov</div>
         <div class="nav-buttons">
-            <button class="btn btn-secondary">Log ind</button>
-            <button class="btn btn-primary">Prøv Gratis <span>→</span></button>
+            <button class="btn btn-secondary" onclick="window.location.href='auth.html'">Log ind</button>
+            <button class="btn btn-primary" onclick="window.location.href='auth.html'">Prøv Gratis <span>→</span></button>
         </div>
     </nav>
 
@@ -397,10 +421,10 @@
 
         <div class="pricing-container">
             <div class="pricing-card">
-                <h3 class="pricing-plan">Starter</h3>
+                <h3 class="pricing-plan">Quick-Access</h3>
                 <div class="pricing-amount">
-                    <span class="price">299</span>
-                    <span class="period">kr/md</span>
+                    <span class="price">39</span>
+                    <span class="period">kr</span>
                 </div>
                 <p class="pricing-description">Perfekt til små virksomheder og freelancere</p>
                 <ul class="feature-list">
@@ -411,7 +435,7 @@
                     <li class="inactive">API-adgang</li>
                     <li class="inactive">Skræddersyede skabeloner</li>
                 </ul>
-                <button class="btn btn-secondary">Vælg Starter</button>
+                <button class="btn btn-primary" onclick="handleQuickAccess()">Køb adgang</button>
             </div>
 
             <div class="pricing-card popular">
@@ -566,7 +590,7 @@
         <section class="pricing-hero" style="padding: 4rem 2rem;">
             <h2>Klar til at komme i gang?</h2>
             <p class="pricing-description">Start din gratis prøveperiode i dag og oplev hvordan DanLov kan revolutionere dit juridiske arbejde.</p>
-            <button class="btn btn-primary">Start Gratis Prøveperiode <span>→</span></button>
+            <button class="btn btn-primary" onclick="window.location.href='auth.html'">Start Gratis Prøveperiode <span>→</span></button>
         </section>
     </main>
 
@@ -579,23 +603,58 @@
     </footer>
 
     <script>
-        // Toggle FAQ answers
-        document.querySelectorAll('.faq-item').forEach(item => {
-            item.addEventListener('click', () => {
-                item.classList.toggle('active');
-                const toggle = item.querySelector('.toggle');
-                toggle.textContent = item.classList.contains('active') ? '-' : '+';
-            });
+async function handleQuickAccess() {
+    // Fix gitIdToken to getIdToken
+    const user = firebase.auth().currentUser;
+    if (!user) {
+        window.location.href = '/auth.html';
+        return;
+    }
+
+    try {
+        const idToken = await user.getIdToken(); // Fix the typo here
+        const response = await fetch('https://lawsaas-backend-dcffd2a3c58d.herokuapp.com/create-checkout-session', {
+            method: 'POST', // Fix capitalization
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${idToken}`
+            },
+            body: JSON.stringify({ 
+                userId: user.uid
+            })
         });
 
-        // Toggle billing period
-        document.querySelectorAll('.billing-option').forEach(option => {
-            option.addEventListener('click', () => {
-                document.querySelectorAll('.billing-option').forEach(opt => opt.classList.remove('active'));
-                option.classList.add('active');
-                // Here you would typically update the prices based on the selected billing period
-            });
+        const { id: sessionId } = await response.json();
+        const result = await stripe.redirectToCheckout({
+            sessionId: sessionId
         });
+
+        if (result.error) {
+            alert('Der opstod en fejl. Prøv igen.');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Der opstod en fejl. Prøv igen.');
+    }
+}        
+document.addEventListener('DOMContentLoaded', () => {
+    // Toggle FAQ answers
+    document.querySelectorAll('.faq-item').forEach(item => {
+        item.addEventListener('click', () => {
+            item.classList.toggle('active');
+            const toggle = item.querySelector('.toggle');
+            toggle.textContent = item.classList.contains('active') ? '-' : '+';
+        });
+    });
+
+    // Toggle billing period
+    document.querySelectorAll('.billing-option').forEach(option => {
+        option.addEventListener('click', () => {
+            document.querySelectorAll('.billing-option').forEach(opt => opt.classList.remove('active'));
+            option.classList.add('active');
+        });
+    });
+});
     </script>
 </body>
 </html>
