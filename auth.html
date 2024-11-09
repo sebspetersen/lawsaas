@@ -199,6 +199,15 @@
 
     // Initialize Firebase
     firebase.initializeApp(firebaseConfig);
+
+    // Set authentication persistence to LOCAL
+    firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL)
+        .then(() => {
+            console.log("Persistence set to LOCAL");
+        })
+        .catch((error) => {
+            console.error("Error setting persistence:", error);
+        });
     
     // Initialize Stripe
     const stripe = Stripe('pk_live_51QIqWhQO2oGbYUgyvoDOr8e16QUBLJ5n05pqGyCowFpIq2Ig3DZ1dyciamG0QqRi0gRxZyDXqbgbPpMLEBrbvpf3002BOY4w3Q');
