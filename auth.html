@@ -151,7 +151,7 @@
     <div class="auth-container">
         <div id="login-form">
             <h2 class="form-title">Log ind</h2>
-            <form>
+            <form onsubmit="event.preventDefault(); login();">
                 <div class="form-group">
                     <label for="login-email">Email</label>
                     <input type="email" id="login-email" name="email" required>
@@ -170,7 +170,7 @@
 
         <div id="register-form" style="display: none;">
             <h2 class="form-title">Opret konto</h2>
-            <form>
+            <form onsubmit="event.preventDefault(); register();">
                 <div class="form-group">
                     <label for="register-email">Email</label>
                     <input type="email" id="register-email" required>
@@ -191,68 +191,70 @@
             </div>
         </div>
     </div>
-<!-- Firebase SDK -->
-<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
-<!-- Stripe -->
-<script src="https://js.stripe.com/v3/"></script>
 
-<script type="module">
-    import { handleLogin, handleRegister } from './auth.js';
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
 
-    // Attach event listeners
-    document.querySelector('#login-form form').addEventListener('submit', handleLogin);
-    document.querySelector('#register-form form').addEventListener('submit', handleRegister);
+    <script>
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "your-api-key",
+            authDomain: "your-auth-domain",
+            projectId: "your-project-id",
+            storageBucket: "your-storage-bucket",
+            messagingSenderId: "your-messaging-sender-id",
+            appId: "your-app-id"
+        };
 
-    // Make toggleForms available globally
-    window.toggleForms = function() {
-        const loginForm = document.getElementById('login-form');
-        const registerForm = document.getElementById('register-form');
-        
-        loginForm.style.display = loginForm.style.display === 'none' ? 'block' : 'none';
-        registerForm.style.display = registerForm.style.display === 'none' ? 'block' : 'none';
-
-        // Clear errors and forms
-        document.getElementById('login-error').textContent = '';
-        document.getElementById('register-error').textContent = '';
-        document.querySelector('#login-form form').reset();
-        document.querySelector('#register-form form').reset();
-    };
-
-    // Check if we're returning from somewhere
-    document.addEventListener('DOMContentLoaded', () => {
-        const returnUrl = localStorage.getItem('returnUrl');
-        if (returnUrl) {
-            document.querySelector('#login-form .btn').textContent = 'Log ind for at fortsætte';
+        // Initialize Firebase
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
         }
 
-        // Check if user is already logged in
-        firebase.auth().onAuthStateChanged((user) => {
-            if (user) {
-                const returnUrl = localStorage.getItem('returnUrl');
-                if (returnUrl) {
-                    localStorage.removeItem('returnUrl');
-                    window.location.href = returnUrl;
-                } else {
-                    // Check subscription status
-                    user.getIdToken().then(token => {
-                        fetch('https://lawsaas-backend-dcffd2a3c58d.herokuapp.com/check-session-status', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'Authorization': `Bearer ${token}`
-                            }
-                        })
-                        .then(response => response.json())
-                        .then(data => {
-                            window.location.href = data.paid ? '/chat.html' : '/pricing.html';
-                        })
-                        .catch(console.error);
-                    });
-                }
+        // Login function
+        async function login() {
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+
+            try {
+                await firebase.auth().signInWithEmailAndPassword(email, password);
+                // Redirect to chat.html on successful login
+                window.location.href = 'chat.html';
+            } catch (error) {
+                document.getElementById('login-error').textContent = error.message;
             }
-        });
-    });
-</script>
+        }
+
+        // Registration function
+        async function register() {
+            const email = document.getElementById('register-email').value;
+            const password = document.getElementById('register-password').value;
+            const confirmPassword = document.getElementById('register-password-confirm').value;
+
+            if (password !== confirmPassword) {
+                document.getElementById('register-error').textContent = 'Passwords do not match';
+                return;
+            }
+
+            try {
+                await firebase.auth().createUserWithEmailAndPassword(email, password);
+                // Redirect to chat.html on successful registration
+                window.location.href = 'chat.html';
+            } catch (error) {
+                document.getElementById('register-error').textContent = error.message;
+            }
+        }
+
+        // Toggle between login and registration forms
+        function toggleForms() {
+            const loginForm = document.getElementById('login-form');
+            const registerForm = document.getElementById('register-form');
+            loginForm.style.display = loginForm.style.display === 'none' ? 'block' : 'none';
+            registerForm.style.display = registerForm.style.display === 'none' ? 'block' : 'none';
+            document.getElementById('login-error').textContent = '';
+            document.getElementById('register-error').textContent = '';
+        }
+    </script>
 </body>
 </html>
