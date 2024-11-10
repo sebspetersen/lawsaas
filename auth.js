@@ -3,6 +3,15 @@
 import { createUser, signIn } from './firebase';
 import { createStripeCheckoutSession } from './stripe';
 
+// Set Firebase authentication persistence to LOCAL
+firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL)
+    .then(() => {
+        console.log("Persistence set to LOCAL.");
+    })
+    .catch((error) => {
+        console.error("Error setting persistence:", error);
+    });
+
 // Price IDs from Stripe
 const PRICE_IDS = {
   starter: 'price_starter',
