@@ -1,76 +1,130 @@
 // auth.js
 
-import { createUser, signIn } from './firebase';
-import { createStripeCheckoutSession } from './stripe';
+// Remove these imports since we're using global Firebase
+// import { createUser, signIn } from './firebase';
+// import { createStripeCheckoutSession } from './stripe';
 
-// Set Firebase authentication persistence to LOCAL
-firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL)
-    .then(() => {
-        console.log("Persistence set to LOCAL.");
-    })
-    .catch((error) => {
-        console.error("Error setting persistence:", error);
-    });
-
-// Price IDs from Stripe
-const PRICE_IDS = {
-  starter: 'price_starter',
-  professional: 'price_professional',
-  enterprise: 'price_enterprise'
+// Initialize Firebase and Stripe at the top
+const firebaseConfig = {
+  apiKey: "AIzaSyBCzQKSufkAp1SpuTreufydl3iuA36HopQ",
+  authDomain: "jurda-5a6b2.firebaseapp.com",
+  projectId: "jurda-5a6b2",
+  storageBucket: "jurda-5a6b2.firebasestorage.app",
+  messagingSenderId: "668210342012",
+  appId: "1:668210342012:web:e4504c92aa20ef63fe01f9",
+  measurementId: "G-M6JT7LWHC1"
 };
 
-document.addEventListener('DOMContentLoaded', () => {
-  const loginForm = document.getElementById('login-form');
-  const registerForm = document.getElementById('register-form');
+// Initialize Firebase
+if (!firebase.apps?.length) {
+  firebase.initializeApp(firebaseConfig);
+}
 
-  if (loginForm) {
-    loginForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const email = loginForm.querySelector('[name="email"]').value;
-      const password = loginForm.querySelector('[name="password"]').value;
+const auth = firebase.auth();
+const stripe = Stripe('pk_live_51QIqWhQO2oGbYUgyvoDOr8e16QUBLJ5n05pqGyCowFpIq2Ig3DZ1dyciamG0QqRi0gRxZyDXqbgbPpMLEBrbvpf3002BOY4w3Q');
 
-      try {
-        const user = await signIn(email, password);
-        console.log("User signed in:", user);
+// Set Firebase authentication persistence
+auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
+  .then(() => console.log("Persistence set to LOCAL"))
+  .catch((error) => console.error("Error setting persistence:", error));
 
-        // Redirect to chat.html after successful login
-        window.location.href = '/chat.html';
-      } catch (error) {
-        document.getElementById('login-error').textContent = error.message;
-      }
+// Add auth state listener
+auth.onAuthStateChanged((user) => {
+  if (user) {
+    user.getIdToken().then((token) => {
+      localStorage.setItem('authToken', token);
     });
-  }
-
-  if (registerForm) {
-    registerForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const email = registerForm.querySelector('[name="email"]').value;
-      const password = registerForm.querySelector('[name="password"]').value;
-      const selectedPlan = registerForm.querySelector('[name="plan"]').value;
-
-      try {
-        // Create user in Firebase
-        const user = await createUser(email, password);
-        console.log("User registered:", user);
-
-        // Redirect to Stripe Checkout for selected plan
-        await createStripeCheckoutSession(user.uid, PRICE_IDS[selectedPlan]);
-      } catch (error) {
-        document.getElementById('register-error').textContent = error.message;
-      }
-    });
+  } else {
+    localStorage.removeItem('authToken');
   }
 });
 
-// Function to handle the purchase process for each plan
-async function handleQuickAccess(plan) {
-  const user = firebase.auth().currentUser;
-  if (!user) {
-    window.location.href = '/auth.html';  // Redirect to login if not authenticated
-    return;
-  }
-
+// Handle login
+async function handleLogin(event) {
+  event.preventDefault();
+  const errorElement = document.getElementById('login-error');
+  const button = event.target.querySelector('button[type="submit"]');
+  
   try {
+    button.disabled = true;
+    button.textContent = 'Logger ind...';
+    
+    const email = document.getElementById('login-email').value;
+    const password = document.getElementById('login-password').value;
+    
+    const userCredential = await auth.signInWithEmailAndPassword(email, password);
+    const idToken = await userCredential.user.getIdToken();
+    
+    // Check for returnUrl
+    const returnUrl = localStorage.getItem('returnUrl');
+    if (returnUrl) {
+      localStorage.removeItem('returnUrl');
+      window.location.href = returnUrl;
+      return;
+    }
+
+    // Check subscription status
+    const response = await fetch('https://lawsaas-backend-dcffd2a3c58d.herokuapp.com/check-session-status', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${idToken}`
+      }
+    });
+
+    const data = await response.json();
+    window.location.href = data.paid ? '/chat.html' : '/pricing.html';
+  } catch (error) {
+    console.error('Login error:', error);
+    errorElement.textContent = 'Ugyldigt login. Kontroller venligst dine oplysninger.';
+  } finally {
+    button.disabled = false;
+    button.textContent = 'Log ind';
+  }
+}
+
+// Handle registration
+async function handleRegister(event) {
+  event.preventDefault();
+  const errorElement = document.getElementById('register-error');
+  const button = event.target.querySelector('button[type="submit"]');
+  
+  try {
+    button.disabled = true;
+    button.textContent = 'Opretter konto...';
+    
+    const email = document.getElementById('register-email').value;
+    const password = document.getElementById('register-password').value;
+    const passwordConfirm = document.getElementById('register-password-confirm').value;
+
+    if (password !== passwordConfirm) {
+      throw new Error('Adgangskoderne matcher ikke');
+    }
+
+    const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+    const idToken = await userCredential.user.getIdToken();
+
+    window.location.href = '/pricing.html';
+  } catch (error) {
+    console.error('Registration error:', error);
+    errorElement.textContent = error.message;
+  } finally {
+    button.disabled = false;
+    button.textContent = 'Opret konto';
+  }
+}
+
+// Handle Quick Access purchase
+async function handleQuickAccess() {
+  try {
+    const user = auth.currentUser;
+    
+    if (!user) {
+      localStorage.setItem('returnUrl', '/pricing.html');
+      window.location.href = '/auth.html';
+      return;
+    }
+
     const idToken = await user.getIdToken();
     const response = await fetch('https://lawsaas-backend-dcffd2a3c58d.herokuapp.com/create-checkout-session', {
       method: 'POST',
@@ -78,20 +132,29 @@ async function handleQuickAccess(plan) {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${idToken}`
       },
-      body: JSON.stringify({ userId: user.uid, priceId: PRICE_IDS[plan] })
+      body: JSON.stringify({ 
+        userId: user.uid
+      })
     });
 
+    if (!response.ok) {
+      throw new Error('Failed to create checkout session');
+    }
+
     const { id: sessionId } = await response.json();
-    await stripe.redirectToCheckout({ sessionId: sessionId });
+    
+    const result = await stripe.redirectToCheckout({
+      sessionId: sessionId
+    });
+
+    if (result.error) {
+      throw new Error(result.error.message);
+    }
   } catch (error) {
     console.error('Error:', error);
     alert('Der opstod en fejl. Prøv igen.');
   }
 }
 
-// Attach the handleQuickAccess function to the pricing page buttons
-document.addEventListener('DOMContentLoaded', () => {
-  document.getElementById('starter-plan-button')?.addEventListener('click', () => handleQuickAccess('starter'));
-  document.getElementById('professional-plan-button')?.addEventListener('click', () => handleQuickAccess('professional'));
-  document.getElementById('enterprise-plan-button')?.addEventListener('click', () => handleQuickAccess('enterprise'));
-});
+// Export the functions so they can be imported by other modules
+export { handleLogin, handleRegister, handleQuickAccess };

@@ -41,6 +41,16 @@
         .nav-logo {
             font-weight: 600;
             font-size: 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+            color: var(--text-color);
+        }
+
+        .nav-logo::before {
+            content: "⚖️";
+            font-size: 1.5rem;
         }
 
         .auth-container {
@@ -92,16 +102,19 @@
             cursor: pointer;
             transition: all 0.2s;
             border: none;
-        }
-
-        .btn-primary {
             background: var(--accent-color);
             color: white;
         }
 
-        .btn-primary:hover {
+        .btn:hover {
             opacity: 0.9;
             transform: translateY(-1px);
+        }
+
+        .btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
         }
 
         .error-message {
@@ -131,14 +144,14 @@
 </head>
 <body>
     <nav>
-        <div class="nav-logo">DanLov</div>
+        <a href="/" class="nav-logo">DanLov</a>
         <a href="/" style="color: var(--secondary-text); text-decoration: none;">← Tilbage til forside</a>
     </nav>
 
     <div class="auth-container">
         <div id="login-form">
             <h2 class="form-title">Log ind</h2>
-            <form id="login-form" onsubmit="handleLogin(event)">
+            <form>
                 <div class="form-group">
                     <label for="login-email">Email</label>
                     <input type="email" id="login-email" name="email" required>
@@ -147,7 +160,7 @@
                     <label for="login-password">Adgangskode</label>
                     <input type="password" id="login-password" name="password" required>
                 </div>
-                <button type="submit" class="btn btn-primary">Log ind</button>
+                <button type="submit" class="btn">Log ind</button>
                 <div id="login-error" class="error-message"></div>
             </form>
             <div class="auth-switch">
@@ -157,7 +170,7 @@
 
         <div id="register-form" style="display: none;">
             <h2 class="form-title">Opret konto</h2>
-            <form onsubmit="handleRegister(event)">
+            <form>
                 <div class="form-group">
                     <label for="register-email">Email</label>
                     <input type="email" id="register-email" required>
@@ -170,7 +183,7 @@
                     <label for="register-password-confirm">Gentag adgangskode</label>
                     <input type="password" id="register-password-confirm" required minlength="6">
                 </div>
-                <button type="submit" class="btn btn-primary">Opret konto</button>
+                <button type="submit" class="btn">Opret konto</button>
                 <div id="register-error" class="error-message"></div>
             </form>
             <div class="auth-switch">
@@ -178,156 +191,67 @@
             </div>
         </div>
     </div>
-
 <!-- Firebase SDK -->
 <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
 <!-- Stripe -->
 <script src="https://js.stripe.com/v3/"></script>
 
-<script>
-    // Firebase configuration
-    const firebaseConfig = {
-        apiKey: "AIzaSyBCzQKSufkAp1SpuTreufydl3iuA36HopQ",
-        authDomain: "jurda-5a6b2.firebaseapp.com",
-        projectId: "jurda-5a6b2",
-        storageBucket: "jurda-5a6b2.firebasestorage.app",
-        messagingSenderId: "668210342012",
-        appId: "1:668210342012:web:e4504c92aa20ef63fe01f9",
-        measurementId: "G-M6JT7LWHC1"
-    };
+<script type="module">
+    import { handleLogin, handleRegister } from './auth.js';
 
-    // Initialize Firebase
-    firebase.initializeApp(firebaseConfig);
+    // Attach event listeners
+    document.querySelector('#login-form form').addEventListener('submit', handleLogin);
+    document.querySelector('#register-form form').addEventListener('submit', handleRegister);
 
-    // Set authentication persistence to LOCAL
-    firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL)
-        .then(() => {
-            console.log("Persistence set to LOCAL");
-        })
-        .catch((error) => {
-            console.error("Error setting persistence:", error);
-        });
-    
-    // Initialize Stripe
-    const stripe = Stripe('pk_live_51QIqWhQO2oGbYUgyvoDOr8e16QUBLJ5n05pqGyCowFpIq2Ig3DZ1dyciamG0QqRi0gRxZyDXqbgbPpMLEBrbvpf3002BOY4w3Q');
-
-    const API_URL = 'https://lawsaas-backend-dcffd2a3c58d.herokuapp.com';
-
-    async function handleLogin(event) {
-        event.preventDefault();
-        const button = event.target.querySelector('button[type="submit"]');
-        setLoading(true, button);
-
-        const errorElement = document.getElementById('login-error');
-        errorElement.textContent = '';
-
-        try {
-            const email = document.getElementById('login-email').value;
-            const password = document.getElementById('login-password').value;
-            
-            // Firebase authentication
-            const userCredential = await firebase.auth().signInWithEmailAndPassword(email, password);
-            const idToken = await userCredential.user.getIdToken();
-
-            // Check if user has paid
-            const response = await fetch(`${API_URL}/check-session-status`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${idToken}`
-                }
-            });
-
-            const data = await response.json();
-            
-            if (data.paid) {
-                window.location.href = '/chat.html';
-            } else {
-                window.location.href = '/pricing.html';
-            }
-        } catch (error) {
-            console.error('Login error:', error);
-            errorElement.textContent = 'Der opstod en fejl ved login. Prøv igen.';
-        } finally {
-            setLoading(false, button);
-        }
-    }
-
-    async function handleRegister(event) {
-        event.preventDefault();
-        const button = event.target.querySelector('button[type="submit"]');
-        setLoading(true, button);
-
-        const errorElement = document.getElementById('register-error');
-        errorElement.textContent = ''; 
-        
-        try {
-            const email = document.getElementById('register-email').value;
-            const password = document.getElementById('register-password').value;
-            const passwordConfirm = document.getElementById('register-password-confirm').value;
-
-            if (password !== passwordConfirm) {
-                errorElement.textContent = 'Adgangskoderne matcher ikke';
-                return;
-            }
-
-            // Create user in Firebase
-            const userCredential = await firebase.auth().createUserWithEmailAndPassword(email, password);
-            const idToken = await userCredential.user.getIdToken();
-
-            // Create Stripe checkout session
-            const response = await fetch(`${API_URL}/create-checkout-session`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${idToken}`
-                },
-                body: JSON.stringify({ userId: userCredential.user.uid })
-            });
-
-            const { id: sessionId } = await response.json();
-
-            // Redirect to Stripe checkout
-            await stripe.redirectToCheckout({ sessionId: sessionId });
-        } catch (error) {
-            console.error('Registration error:', error);
-            errorElement.textContent = 'Der opstod en fejl ved registrering';
-        } finally {
-            setLoading(false, button);
-        }
-    }
-
-    function setLoading(isLoading, buttonElement) {
-        if (isLoading) {
-            buttonElement.disabled = true;
-            buttonElement.textContent = 'Vent venligst...';
-        } else {
-            buttonElement.disabled = false;
-            buttonElement.textContent = buttonElement.getAttribute('data-original-text');
-        }
-    }
-
-    function toggleForms() {
+    // Make toggleForms available globally
+    window.toggleForms = function() {
         const loginForm = document.getElementById('login-form');
         const registerForm = document.getElementById('register-form');
         
         loginForm.style.display = loginForm.style.display === 'none' ? 'block' : 'none';
         registerForm.style.display = registerForm.style.display === 'none' ? 'block' : 'none';
 
+        // Clear errors and forms
         document.getElementById('login-error').textContent = '';
         document.getElementById('register-error').textContent = '';
-        
         document.querySelector('#login-form form').reset();
         document.querySelector('#register-form form').reset();
-    }
+    };
 
+    // Check if we're returning from somewhere
     document.addEventListener('DOMContentLoaded', () => {
-        const loginButton = document.querySelector('#login-form button[type="submit"]');
-        const registerButton = document.querySelector('#register-form button[type="submit"]');
-        
-        loginButton.setAttribute('data-original-text', loginButton.textContent);
-        registerButton.setAttribute('data-original-text', registerButton.textContent);
+        const returnUrl = localStorage.getItem('returnUrl');
+        if (returnUrl) {
+            document.querySelector('#login-form .btn').textContent = 'Log ind for at fortsætte';
+        }
+
+        // Check if user is already logged in
+        firebase.auth().onAuthStateChanged((user) => {
+            if (user) {
+                const returnUrl = localStorage.getItem('returnUrl');
+                if (returnUrl) {
+                    localStorage.removeItem('returnUrl');
+                    window.location.href = returnUrl;
+                } else {
+                    // Check subscription status
+                    user.getIdToken().then(token => {
+                        fetch('https://lawsaas-backend-dcffd2a3c58d.herokuapp.com/check-session-status', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Authorization': `Bearer ${token}`
+                            }
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            window.location.href = data.paid ? '/chat.html' : '/pricing.html';
+                        })
+                        .catch(console.error);
+                    });
+                }
+            }
+        });
     });
 </script>
 </body>

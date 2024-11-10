@@ -19,7 +19,9 @@
     };
 
     // Initialize Firebase
-    firebase.initializeApp(firebaseConfig);
+    if (!firebase.apps?.length) {
+        firebase.initializeApp(firebaseConfig);
+    }
     
     // Initialize Stripe
     const stripe = Stripe('pk_live_51QIqWhQO2oGbYUgyvoDOr8e16QUBLJ5n05pqGyCowFpIq2Ig3DZ1dyciamG0QqRi0gRxZyDXqbgbPpMLEBrbvpf3002BOY4w3Q');
@@ -603,58 +605,104 @@
     </footer>
 
     <script>
-async function handleQuickAccess() {
-    // Fix gitIdToken to getIdToken
-    const user = firebase.auth().currentUser;
-    if (!user) {
-        window.location.href = '/auth.html';
-        return;
-    }
-
-    try {
-        const idToken = await user.getIdToken(); // Fix the typo here
-        const response = await fetch('https://lawsaas-backend-dcffd2a3c58d.herokuapp.com/create-checkout-session', {
-            method: 'POST', // Fix capitalization
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${idToken}`
-            },
-            body: JSON.stringify({ 
-                userId: user.uid
-            })
-        });
-
-        const { id: sessionId } = await response.json();
-        const result = await stripe.redirectToCheckout({
-            sessionId: sessionId
-        });
-
-        if (result.error) {
-            alert('Der opstod en fejl. Prøv igen.');
+        // Handle Quick Access purchase
+        async function handleQuickAccess() {
+            const user = firebase.auth().currentUser;
+            if (!user) {
+                localStorage.setItem('returnUrl', '/pricing.html');
+                window.location.href = '/auth.html';
+                return;
+            }
+    
+            try {
+                const idToken = await user.getIdToken();
+                const response = await fetch('https://lawsaas-backend-dcffd2a3c58d.herokuapp.com/create-checkout-session', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${idToken}`
+                    },
+                    body: JSON.stringify({ 
+                        userId: user.uid
+                    })
+                });
+    
+                if (!response.ok) {
+                    throw new Error('Failed to create checkout session');
+                }
+    
+                const { id: sessionId } = await response.json();
+                const result = await stripe.redirectToCheckout({
+                    sessionId: sessionId
+                });
+    
+                if (result.error) {
+                    throw new Error(result.error.message);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Der opstod en fejl. Prøv igen.');
+            }
         }
-    } catch (error) {
-        console.error('Error:', error);
-        alert('Der opstod en fejl. Prøv igen.');
-    }
-}        
-document.addEventListener('DOMContentLoaded', () => {
-    // Toggle FAQ answers
-    document.querySelectorAll('.faq-item').forEach(item => {
-        item.addEventListener('click', () => {
-            item.classList.toggle('active');
-            const toggle = item.querySelector('.toggle');
-            toggle.textContent = item.classList.contains('active') ? '-' : '+';
+    
+        // Add authentication state handler
+        document.addEventListener('DOMContentLoaded', () => {
+            // Handle authentication state changes
+            firebase.auth().onAuthStateChanged((user) => {
+                if (user) {
+                    // Update UI for logged-in users
+                    const navButtons = document.querySelector('.nav-buttons');
+                    if (navButtons) {
+                        navButtons.innerHTML = `
+                            <button onclick="window.location.href='chat.html'" class="btn btn-secondary">
+                                Min Konto
+                            </button>
+                        `;
+                    }
+    
+                    // Check if returning from Stripe
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const sessionId = urlParams.get('session_id');
+                    
+                    if (sessionId) {
+                        user.getIdToken().then(token => {
+                            fetch('https://lawsaas-backend-dcffd2a3c58d.herokuapp.com/check-session-status', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'Authorization': `Bearer ${token}`
+                                },
+                                body: JSON.stringify({ sessionId })
+                            })
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.paid) {
+                                    window.location.href = '/chat.html';
+                                }
+                            })
+                            .catch(console.error);
+                        });
+                    }
+                }
+            });
+    
+            // Handle FAQ toggles
+            document.querySelectorAll('.faq-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    item.classList.toggle('active');
+                    const toggle = item.querySelector('.toggle');
+                    toggle.textContent = item.classList.contains('active') ? '-' : '+';
+                });
+            });
+    
+            // Handle billing toggle
+            document.querySelectorAll('.billing-option').forEach(option => {
+                option.addEventListener('click', () => {
+                    document.querySelectorAll('.billing-option').forEach(opt => opt.classList.remove('active'));
+                    option.classList.add('active');
+                });
+            });
         });
-    });
-
-    // Toggle billing period
-    document.querySelectorAll('.billing-option').forEach(option => {
-        option.addEventListener('click', () => {
-            document.querySelectorAll('.billing-option').forEach(opt => opt.classList.remove('active'));
-            option.classList.add('active');
-        });
-    });
-});
     </script>
 </body>
 </html>
