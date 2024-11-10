@@ -138,14 +138,14 @@
     <div class="auth-container">
         <div id="login-form">
             <h2 class="form-title">Log ind</h2>
-            <form onsubmit="handleLogin(event)">
+            <form id="login-form" onsubmit="handleLogin(event)">
                 <div class="form-group">
                     <label for="login-email">Email</label>
-                    <input type="email" id="login-email" required>
+                    <input type="email" id="login-email" name="email" required>
                 </div>
                 <div class="form-group">
                     <label for="login-password">Adgangskode</label>
-                    <input type="password" id="login-password" required>
+                    <input type="password" id="login-password" name="password" required>
                 </div>
                 <button type="submit" class="btn btn-primary">Log ind</button>
                 <div id="login-error" class="error-message"></div>
@@ -179,78 +179,156 @@
         </div>
     </div>
 
-    <script>
-        function toggleForms() {
-            const loginForm = document.getElementById('login-form');
-            const registerForm = document.getElementById('register-form');
-            
-            loginForm.style.display = loginForm.style.display === 'none' ? 'block' : 'none';
-            registerForm.style.display = registerForm.style.display === 'none' ? 'block' : 'none';
-        }
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+<!-- Stripe -->
+<script src="https://js.stripe.com/v3/"></script>
 
-        async function handleLogin(event) {
-            event.preventDefault();
+<script>
+    // Firebase configuration
+    const firebaseConfig = {
+        apiKey: "AIzaSyBCzQKSufkAp1SpuTreufydl3iuA36HopQ",
+        authDomain: "jurda-5a6b2.firebaseapp.com",
+        projectId: "jurda-5a6b2",
+        storageBucket: "jurda-5a6b2.firebasestorage.app",
+        messagingSenderId: "668210342012",
+        appId: "1:668210342012:web:e4504c92aa20ef63fe01f9",
+        measurementId: "G-M6JT7LWHC1"
+    };
+
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+
+    // Set authentication persistence to LOCAL
+    firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL)
+        .then(() => {
+            console.log("Persistence set to LOCAL");
+        })
+        .catch((error) => {
+            console.error("Error setting persistence:", error);
+        });
+    
+    // Initialize Stripe
+    const stripe = Stripe('pk_live_51QIqWhQO2oGbYUgyvoDOr8e16QUBLJ5n05pqGyCowFpIq2Ig3DZ1dyciamG0QqRi0gRxZyDXqbgbPpMLEBrbvpf3002BOY4w3Q');
+
+    const API_URL = 'https://lawsaas-backend-dcffd2a3c58d.herokuapp.com';
+
+    async function handleLogin(event) {
+        event.preventDefault();
+        const button = event.target.querySelector('button[type="submit"]');
+        setLoading(true, button);
+
+        const errorElement = document.getElementById('login-error');
+        errorElement.textContent = '';
+
+        try {
             const email = document.getElementById('login-email').value;
             const password = document.getElementById('login-password').value;
-            const errorElement = document.getElementById('login-error');
+            
+            // Firebase authentication
+            const userCredential = await firebase.auth().signInWithEmailAndPassword(email, password);
+            const idToken = await userCredential.user.getIdToken();
 
-            try {
-                const response = await fetch('/api/login', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ email, password })
-                });
-
-                const data = await response.json();
-
-                if (response.ok) {
-                    localStorage.setItem('token', data.token);
-                    localStorage.setItem('user', JSON.stringify(data.user));
-                    window.location.href = '/chat';
-                } else {
-                    errorElement.textContent = data.error;
+            // Check if user has paid
+            const response = await fetch(`${API_URL}/check-session-status`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${idToken}`
                 }
-            } catch (error) {
-                errorElement.textContent = 'Der opstod en fejl ved login';
-            }
-        }
+            });
 
-        async function handleRegister(event) {
-            event.preventDefault();
+            const data = await response.json();
+            
+            if (data.paid) {
+                window.location.href = '/chat.html';
+            } else {
+                window.location.href = '/pricing.html';
+            }
+        } catch (error) {
+            console.error('Login error:', error);
+            errorElement.textContent = 'Der opstod en fejl ved login. Prøv igen.';
+        } finally {
+            setLoading(false, button);
+        }
+    }
+
+    async function handleRegister(event) {
+        event.preventDefault();
+        const button = event.target.querySelector('button[type="submit"]');
+        setLoading(true, button);
+
+        const errorElement = document.getElementById('register-error');
+        errorElement.textContent = ''; 
+        
+        try {
             const email = document.getElementById('register-email').value;
             const password = document.getElementById('register-password').value;
             const passwordConfirm = document.getElementById('register-password-confirm').value;
-            const errorElement = document.getElementById('register-error');
 
             if (password !== passwordConfirm) {
                 errorElement.textContent = 'Adgangskoderne matcher ikke';
                 return;
             }
 
-            try {
-                const response = await fetch('/api/register', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ email, password })
-                });
+            // Create user in Firebase
+            const userCredential = await firebase.auth().createUserWithEmailAndPassword(email, password);
+            const idToken = await userCredential.user.getIdToken();
 
-                const data = await response.json();
+            // Create Stripe checkout session
+            const response = await fetch(`${API_URL}/create-checkout-session`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${idToken}`
+                },
+                body: JSON.stringify({ userId: userCredential.user.uid })
+            });
 
-                if (response.ok) {
-                    localStorage.setItem('token', data.token);
-                    localStorage.setItem('user', JSON.stringify(data.user));
-                    window.location.href = '/chat';
-                } else {
-                    errorElement.textContent = data.error;
-                }
-            } catch (error) {
-                errorElement.textContent = 'Der opstod en fejl ved registrering';
-            }
+            const { id: sessionId } = await response.json();
+
+            // Redirect to Stripe checkout
+            await stripe.redirectToCheckout({ sessionId: sessionId });
+        } catch (error) {
+            console.error('Registration error:', error);
+            errorElement.textContent = 'Der opstod en fejl ved registrering';
+        } finally {
+            setLoading(false, button);
         }
-    </script>
+    }
+
+    function setLoading(isLoading, buttonElement) {
+        if (isLoading) {
+            buttonElement.disabled = true;
+            buttonElement.textContent = 'Vent venligst...';
+        } else {
+            buttonElement.disabled = false;
+            buttonElement.textContent = buttonElement.getAttribute('data-original-text');
+        }
+    }
+
+    function toggleForms() {
+        const loginForm = document.getElementById('login-form');
+        const registerForm = document.getElementById('register-form');
+        
+        loginForm.style.display = loginForm.style.display === 'none' ? 'block' : 'none';
+        registerForm.style.display = registerForm.style.display === 'none' ? 'block' : 'none';
+
+        document.getElementById('login-error').textContent = '';
+        document.getElementById('register-error').textContent = '';
+        
+        document.querySelector('#login-form form').reset();
+        document.querySelector('#register-form form').reset();
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const loginButton = document.querySelector('#login-form button[type="submit"]');
+        const registerButton = document.querySelector('#register-form button[type="submit"]');
+        
+        loginButton.setAttribute('data-original-text', loginButton.textContent);
+        registerButton.setAttribute('data-original-text', registerButton.textContent);
+    });
+</script>
 </body>
 </html>
