@@ -448,6 +448,27 @@
     </div>
 
     <script>
+        async function verifyPaymentStatus() {
+            return fetch('/verify-payment').then(response => response.json()).then(data => data.paid);
+        }
+
+        function initiatePurchase() {
+            window.location.href = '/start-stripe-checkout';
+        }
+
+        async function initializeChatPage() {
+            const isPaid = await verifyPaymentStatus();
+            document.getElementById('user-status').style.display = 'block';
+
+            if (!isPaid) {
+                document.getElementById('purchase-prompt').style.display = 'block';
+                document.getElementById('chat-interface').style.display = 'none';
+            } else {
+                document.getElementById('purchase-prompt').style.display = 'none';
+                document.getElementById('chat-interface').style.display = 'flex';
+            }
+        }
+
         let cases = JSON.parse(localStorage.getItem('cases')) || [];
         let currentCaseId = null;
         let isTyping = false;
@@ -644,6 +665,8 @@
                 sidebar.classList.remove('active');
             }
         });
+        
+        document.addEventListener('DOMContentLoaded', initializeChatPage);
     </script>
 </body>
 </html>
