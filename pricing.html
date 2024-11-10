@@ -1,32 +1,6 @@
 <!DOCTYPE html>
 <html lang="da">
-<head>
-    <!-- Add these in the <head> section -->
-<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
-<script src="https://js.stripe.com/v3/"></script>
-
-<script>
-    // Firebase configuration
-    const firebaseConfig = {
-        apiKey: "AIzaSyBCzQKSufkAp1SpuTreufydl3iuA36HopQ",
-        authDomain: "jurda-5a6b2.firebaseapp.com",
-        projectId: "jurda-5a6b2",
-        storageBucket: "jurda-5a6b2.firebasestorage.app",
-        messagingSenderId: "668210342012",
-        appId: "1:668210342012:web:e4504c92aa20ef63fe01f9",
-        measurementId: "G-M6JT7LWHC1"
-    };
-
-    // Initialize Firebase
-    if (!firebase.apps?.length) {
-        firebase.initializeApp(firebaseConfig);
-    }
-    
-    // Initialize Stripe
-    const stripe = Stripe('pk_live_51QIqWhQO2oGbYUgyvoDOr8e16QUBLJ5n05pqGyCowFpIq2Ig3DZ1dyciamG0QqRi0gRxZyDXqbgbPpMLEBrbvpf3002BOY4w3Q');
-</script>
-    
+<head>    
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Gennemsigtige priser for DanLov - Din AI-drevne juridiske assistent. Vælg mellem fleksible pakker der passer til dine behov.">
@@ -400,6 +374,31 @@
             }
         }
     </style>
+        <!-- Add these in the <head> section -->
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+<script src="https://js.stripe.com/v3/"></script>
+
+<script>
+    // Firebase configuration
+    const firebaseConfig = {
+        apiKey: "AIzaSyBCzQKSufkAp1SpuTreufydl3iuA36HopQ",
+        authDomain: "jurda-5a6b2.firebaseapp.com",
+        projectId: "jurda-5a6b2",
+        storageBucket: "jurda-5a6b2.firebasestorage.app",
+        messagingSenderId: "668210342012",
+        appId: "1:668210342012:web:e4504c92aa20ef63fe01f9",
+        measurementId: "G-M6JT7LWHC1"
+    };
+
+    // Initialize Firebase
+    if (!firebase.apps?.length) {
+        firebase.initializeApp(firebaseConfig);
+    }
+    
+    // Initialize Stripe
+    const stripe = Stripe('pk_live_51QIqWhQO2oGbYUgyvoDOr8e16QUBLJ5n05pqGyCowFpIq2Ig3DZ1dyciamG0QqRi0gRxZyDXqbgbPpMLEBrbvpf3002BOY4w3Q');
+</script>
 </head>
 <body>
     <nav>
@@ -456,7 +455,7 @@
                     <li>API-adgang</li>
                     <li>Dokumentanalyse & gennemgang</li>
                 </ul>
-                <button class="btn btn-primary">Vælg Professional <span>→</span></button>
+                <button class="btn btn-primary" onclick="handleQuickAccess()">Vælg Professional <span>→</span></button>
             </div>
 
             <div class="pricing-card">
@@ -474,7 +473,7 @@
                     <li>SLA-garanti</li>
                     <li>SSO integration</li>
                 </ul>
-                <button class="btn btn-secondary">Kontakt Salg</button>
+                <button class="btn btn-secondary" onclick="handleQuickAccess()">Kontakt Salg</button>
             </div>
         </div>
 
