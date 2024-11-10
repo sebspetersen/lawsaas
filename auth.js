@@ -31,14 +31,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
       try {
         const user = await signIn(email, password);
-        // Check subscription status
-        const subscription = await getUserSubscription(user.uid);
+        console.log("User signed in:", user);
 
-        if (subscription && subscription.status === 'active') {
-          window.location.href = '/chat';
-        } else {
-          window.location.href = '/pricing';
-        }
+        // Redirect to chat.html after successful login
+        window.location.href = '/chat.html';
       } catch (error) {
         document.getElementById('login-error').textContent = error.message;
       }
@@ -55,8 +51,9 @@ document.addEventListener('DOMContentLoaded', () => {
       try {
         // Create user in Firebase
         const user = await createUser(email, password);
-        
-        // Redirect to Stripe Checkout
+        console.log("User registered:", user);
+
+        // Redirect to Stripe Checkout for selected plan
         await createStripeCheckoutSession(user.uid, PRICE_IDS[selectedPlan]);
       } catch (error) {
         document.getElementById('register-error').textContent = error.message;
