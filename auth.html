@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DanLov • Login</title>
+    <style>
+        :root {
+            --bg-color: #000000;
+            --text-color: #ffffff;
+            --secondary-text: rgba(255, 255, 255, 0.7);
+            --accent-color: #5E6AD2;
+            --card-bg: #111111;
+            --gradient-start: rgba(255, 255, 255, 0.1);
+            --gradient-end: rgba(255, 255, 255, 0.03);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            min-height: 100vh;
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem 2rem;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-logo {
+            font-weight: 600;
+            font-size: 1.25rem;
+        }
+
+        .auth-container {
+            max-width: 400px;
+            margin: 8rem auto 0;
+            padding: 2rem;
+            background: var(--card-bg);
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .form-title {
+            font-size: 1.5rem;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--secondary-text);
+            font-size: 0.9rem;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 0.75rem;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-color);
+            font-size: 1rem;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--accent-color);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 0.75rem;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+        }
+
+        .btn-primary {
+            background: var(--accent-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+
+        .error-message {
+            color: #ff4444;
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+            text-align: center;
+        }
+
+        .auth-switch {
+            margin-top: 1.5rem;
+            text-align: center;
+            color: var(--secondary-text);
+            font-size: 0.9rem;
+        }
+
+        .auth-switch a {
+            color: var(--accent-color);
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .auth-switch a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="nav-logo">DanLov</div>
+        <a href="/" style="color: var(--secondary-text); text-decoration: none;">← Tilbage til forside</a>
+    </nav>
+
+    <div class="auth-container">
+        <div id="login-form">
+            <h2 class="form-title">Log ind</h2>
+            <form onsubmit="handleLogin(event)">
+                <div class="form-group">
+                    <label for="login-email">Email</label>
+                    <input type="email" id="login-email" required>
+                </div>
+                <div class="form-group">
+                    <label for="login-password">Adgangskode</label>
+                    <input type="password" id="login-password" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Log ind</button>
+                <div id="login-error" class="error-message"></div>
+            </form>
+            <div class="auth-switch">
+                Har du ikke en konto? <a onclick="toggleForms()">Opret konto</a>
+            </div>
+        </div>
+
+        <div id="register-form" style="display: none;">
+            <h2 class="form-title">Opret konto</h2>
+            <form onsubmit="handleRegister(event)">
+                <div class="form-group">
+                    <label for="register-email">Email</label>
+                    <input type="email" id="register-email" required>
+                </div>
+                <div class="form-group">
+                    <label for="register-password">Adgangskode</label>
+                    <input type="password" id="register-password" required minlength="6">
+                </div>
+                <div class="form-group">
+                    <label for="register-password-confirm">Gentag adgangskode</label>
+                    <input type="password" id="register-password-confirm" required minlength="6">
+                </div>
+                <button type="submit" class="btn btn-primary">Opret konto</button>
+                <div id="register-error" class="error-message"></div>
+            </form>
+            <div class="auth-switch">
+                Har du allerede en konto? <a onclick="toggleForms()">Log ind</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toggleForms() {
+            const loginForm = document.getElementById('login-form');
+            const registerForm = document.getElementById('register-form');
+            
+            loginForm.style.display = loginForm.style.display === 'none' ? 'block' : 'none';
+            registerForm.style.display = registerForm.style.display === 'none' ? 'block' : 'none';
+        }
+
+        async function handleLogin(event) {
+            event.preventDefault();
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+            const errorElement = document.getElementById('login-error');
+
+            try {
+                const response = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    localStorage.setItem('token', data.token);
+                    localStorage.setItem('user', JSON.stringify(data.user));
+                    window.location.href = '/chat';
+                } else {
+                    errorElement.textContent = data.error;
+                }
+            } catch (error) {
+                errorElement.textContent = 'Der opstod en fejl ved login';
+            }
+        }
+
+        async function handleRegister(event) {
+            event.preventDefault();
+            const email = document.getElementById('register-email').value;
+            const password = document.getElementById('register-password').value;
+            const passwordConfirm = document.getElementById('register-password-confirm').value;
+            const errorElement = document.getElementById('register-error');
+
+            if (password !== passwordConfirm) {
+                errorElement.textContent = 'Adgangskoderne matcher ikke';
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    localStorage.setItem('token', data.token);
+                    localStorage.setItem('user', JSON.stringify(data.user));
+                    window.location.href = '/chat';
+                } else {
+                    errorElement.textContent = data.error;
+                }
+            } catch (error) {
+                errorElement.textContent = 'Der opstod en fejl ved registrering';
+            }
+        }
+    </script>
+</body>
+</html>
