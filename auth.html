@@ -41,16 +41,6 @@
         .nav-logo {
             font-weight: 600;
             font-size: 1.25rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            text-decoration: none;
-            color: var(--text-color);
-        }
-
-        .nav-logo::before {
-            content: "⚖️";
-            font-size: 1.5rem;
         }
 
         .auth-container {
@@ -102,19 +92,16 @@
             cursor: pointer;
             transition: all 0.2s;
             border: none;
+        }
+
+        .btn-primary {
             background: var(--accent-color);
             color: white;
         }
 
-        .btn:hover {
+        .btn-primary:hover {
             opacity: 0.9;
             transform: translateY(-1px);
-        }
-
-        .btn:disabled {
-            opacity: 0.7;
-            cursor: not-allowed;
-            transform: none;
         }
 
         .error-message {
@@ -144,23 +131,23 @@
 </head>
 <body>
     <nav>
-        <a href="/" class="nav-logo">DanLov</a>
+        <div class="nav-logo">DanLov</div>
         <a href="/" style="color: var(--secondary-text); text-decoration: none;">← Tilbage til forside</a>
     </nav>
 
     <div class="auth-container">
         <div id="login-form">
             <h2 class="form-title">Log ind</h2>
-            <form onsubmit="event.preventDefault(); login();">
+            <form onsubmit="handleLogin(event)">
                 <div class="form-group">
                     <label for="login-email">Email</label>
-                    <input type="email" id="login-email" name="email" required>
+                    <input type="email" id="login-email" required>
                 </div>
                 <div class="form-group">
                     <label for="login-password">Adgangskode</label>
-                    <input type="password" id="login-password" name="password" required>
+                    <input type="password" id="login-password" required>
                 </div>
-                <button type="submit" class="btn">Log ind</button>
+                <button type="submit" class="btn btn-primary">Log ind</button>
                 <div id="login-error" class="error-message"></div>
             </form>
             <div class="auth-switch">
@@ -170,7 +157,7 @@
 
         <div id="register-form" style="display: none;">
             <h2 class="form-title">Opret konto</h2>
-            <form onsubmit="event.preventDefault(); register();">
+            <form onsubmit="handleRegister(event)">
                 <div class="form-group">
                     <label for="register-email">Email</label>
                     <input type="email" id="register-email" required>
@@ -183,7 +170,7 @@
                     <label for="register-password-confirm">Gentag adgangskode</label>
                     <input type="password" id="register-password-confirm" required minlength="6">
                 </div>
-                <button type="submit" class="btn">Opret konto</button>
+                <button type="submit" class="btn btn-primary">Opret konto</button>
                 <div id="register-error" class="error-message"></div>
             </form>
             <div class="auth-switch">
@@ -192,68 +179,77 @@
         </div>
     </div>
 
-    <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
-
     <script>
-        // Firebase configuration
-        const firebaseConfig = {
-            apiKey: "AIzaSyBCzQKSufkAp1SpuTreufydl3iuA36HopQ",
-            authDomain: "jurda-5a6b2.firebaseapp.com",
-            projectId: "jurda-5a6b2",
-            storageBucket: "jurda-5a6b2.firebasestorage.app",
-            messagingSenderId: "668210342012",
-            appId: "1:668210342012:web:e4504c92aa20ef63fe01f9"
-        };
-
-        // Initialize Firebase
-        if (!firebase.apps.length) {
-            firebase.initializeApp(firebaseConfig);
+        function toggleForms() {
+            const loginForm = document.getElementById('login-form');
+            const registerForm = document.getElementById('register-form');
+            
+            loginForm.style.display = loginForm.style.display === 'none' ? 'block' : 'none';
+            registerForm.style.display = registerForm.style.display === 'none' ? 'block' : 'none';
         }
 
-        // Login function
-        async function login() {
+        async function handleLogin(event) {
+            event.preventDefault();
             const email = document.getElementById('login-email').value;
             const password = document.getElementById('login-password').value;
+            const errorElement = document.getElementById('login-error');
 
             try {
-                await firebase.auth().signInWithEmailAndPassword(email, password);
-                // Redirect to chat.html on successful login
-                window.location.href = 'chat.html';
+                const response = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    localStorage.setItem('token', data.token);
+                    localStorage.setItem('user', JSON.stringify(data.user));
+                    window.location.href = '/chat';
+                } else {
+                    errorElement.textContent = data.error;
+                }
             } catch (error) {
-                document.getElementById('login-error').textContent = error.message;
+                errorElement.textContent = 'Der opstod en fejl ved login';
             }
         }
 
-        // Registration function
-        async function register() {
+        async function handleRegister(event) {
+            event.preventDefault();
             const email = document.getElementById('register-email').value;
             const password = document.getElementById('register-password').value;
-            const confirmPassword = document.getElementById('register-password-confirm').value;
+            const passwordConfirm = document.getElementById('register-password-confirm').value;
+            const errorElement = document.getElementById('register-error');
 
-            if (password !== confirmPassword) {
-                document.getElementById('register-error').textContent = 'Passwords do not match';
+            if (password !== passwordConfirm) {
+                errorElement.textContent = 'Adgangskoderne matcher ikke';
                 return;
             }
 
             try {
-                await firebase.auth().createUserWithEmailAndPassword(email, password);
-                // Redirect to chat.html on successful registration
-                window.location.href = 'chat.html';
-            } catch (error) {
-                document.getElementById('register-error').textContent = error.message;
-            }
-        }
+                const response = await fetch('/api/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email, password })
+                });
 
-        // Toggle between login and registration forms
-        function toggleForms() {
-            const loginForm = document.getElementById('login-form');
-            const registerForm = document.getElementById('register-form');
-            loginForm.style.display = loginForm.style.display === 'none' ? 'block' : 'none';
-            registerForm.style.display = registerForm.style.display === 'none' ? 'block' : 'none';
-            document.getElementById('login-error').textContent = '';
-            document.getElementById('register-error').textContent = '';
+                const data = await response.json();
+
+                if (response.ok) {
+                    localStorage.setItem('token', data.token);
+                    localStorage.setItem('user', JSON.stringify(data.user));
+                    window.location.href = '/chat';
+                } else {
+                    errorElement.textContent = data.error;
+                }
+            } catch (error) {
+                errorElement.textContent = 'Der opstod en fejl ved registrering';
+            }
         }
     </script>
 </body>
