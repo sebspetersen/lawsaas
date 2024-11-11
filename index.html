@@ -497,10 +497,10 @@
         <section class="hero">
             <h1>Juridisk klarhed på sekunder</h1>
             <p>Din AI-drevne juridiske partner med øjeblikkelig adgang til dansk lovgivning og retspraksis. Få præcise svar og professionel vejledning døgnet rundt.</p>
-            <div class="hero-form">
-                <input type="email" placeholder="Indtast din email..." required>
-                <button class="btn btn-primary">Få direkte adgang! <span>→</span></button>
-            </div>
+            <form id="accessForm">
+                <input type="email" id="emailInput" placeholder="Indtast din email..." required>
+                <button type="button" onclick="initiatePayment()">Få direkte adgang!</button>
+            </form>            
             <div class="stats-bar">
                 <div class="stat-item">
                     <div class="stat-number">50.000+</div>
