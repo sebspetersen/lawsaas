@@ -520,6 +520,8 @@
         </main>
     </div>
 
+    <script src="https://js.stripe.com/v3/"></script>
+
     <script>
         let cases = JSON.parse(localStorage.getItem('cases')) || [];
         let currentCaseId = null;
@@ -664,6 +666,10 @@
                     }
                 });
 
+                if (!response.ok) {
+                    throw new Error('Subscription creation failed');
+                }
+
                 const session = await response.json();
                 const result = await stripe.redirectToCheckout({
                     sessionId: session.sessionId
@@ -673,7 +679,8 @@
                     alert(result.error.message);
                 }
             } catch (error) {
-                alert('Failed to start subscription process');
+                console.error('Subscription error:', error);
+                alert('Der opstod en fejl ved oprettelse af abonnement');
             }
         }
 
