@@ -466,6 +466,30 @@
         .auth-links button:hover {
             text-decoration: underline;
         }
+
+        .subscription-status {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            font-size: 0.9rem;
+        }
+
+        .status-indicator {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        .status-indicator.active {
+            background: var(--success-color);
+        }
+
+        .status-indicator.inactive {
+            background: var(--error-color);
+        }
     </style>
 </head>
 <body>
@@ -599,6 +623,15 @@
             if (authContainer) {
                 authContainer.remove();
             }
+
+            const nav = document.querySelector('nav');
+            const statusDiv = document.createElement('div');
+            statusDiv.className = 'subscription-status';
+            statusDiv.innerHTML = `
+                <span class="status-indicator ${data.hasAccess ? 'active' : 'inactive'}"></span>
+                ${data.hasAccess ? 'Aktivt abonnement' : 'Inaktivt abonnement'}
+            `;
+            nav.appendChild(statusDiv);
         }
 
         async function handleLogin(e) {
@@ -616,7 +649,7 @@
                 const data = await response.json();
                 if (response.ok) {
                     localStorage.setItem('authToken', data.token);
-                    if (data.hasSubscription) {
+                    if (data.hasAccess) {
                         showMainInterface();
                     } else {
                         showPaymentForm();
