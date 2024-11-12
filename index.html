@@ -619,7 +619,7 @@
                     if (data.hasSubscription) {
                         showMainInterface();
                     } else {
-                        showSubscriptionForm();
+                        showPaymentForm();
                     }
                 } else {
                     alert(data.error || 'Login fejlede');
@@ -645,7 +645,7 @@
                 const data = await response.json();
                 if (response.ok) {
                     localStorage.setItem('authToken', data.token);
-                    showSubscriptionForm();
+                    showPaymentForm();
                 } else {
                     alert(data.error);
                 }
@@ -654,9 +654,9 @@
             }
         }
 
-        async function showSubscriptionForm() {
+        async function showPaymentForm() {
             try {
-                console.log('Starting subscription process...');
+                console.log('Creating payment session...');
                 const response = await fetch('https://lawsaas-backend-dcffd2a3c58d.herokuapp.com/api/create-subscription', {
                     method: 'POST',
                     headers: {
@@ -665,29 +665,25 @@
                     }
                 });
 
-                const data = await response.json();
-                
                 if (!response.ok) {
-                    throw new Error(data.error || 'Subscription creation failed');
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || 'Payment creation failed');
                 }
 
-                if (!data.sessionId) {
-                    throw new Error('No session ID received');
-                }
+                const session = await response.json();
+                console.log('Got session:', session);
 
-                console.log('Got sessionId:', data.sessionId);
-                
                 const stripe = Stripe('pk_live_51QIqWhQO2oGbYUgyvoDOr8e16QUBLJ5n05pqGyCowFpIq2Ig3DZ1dyciamG0QqRi0gRxZyDXqbgbPpMLEBrbvpf3002BOY4w3Q');
                 const result = await stripe.redirectToCheckout({
-                    sessionId: data.sessionId
+                    sessionId: session.sessionId
                 });
 
                 if (result.error) {
                     throw new Error(result.error.message);
                 }
             } catch (error) {
-                console.error('Subscription error:', error);
-                alert('Subscription error: ' + error.message);
+                console.error('Payment error:', error);
+                alert('Der opstod en fejl ved oprettelse af betaling: ' + error.message);
             }
         }
 
