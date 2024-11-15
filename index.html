@@ -675,11 +675,7 @@
                 if (response.ok) {
                     localStorage.setItem('authToken', data.token);
                     localStorage.setItem('userEmail', email);
-                    if (data.hasAccess) {
-                        showMainInterface();
-                    } else {
-                        showPaymentForm();
-                    }
+                    showMainInterface();
                 } else {
                     alert(data.error || 'Login fejlede');
                 }
@@ -951,6 +947,11 @@
             const email = localStorage.getItem('userEmail');
             if (email) {
                 document.querySelector('.user-email').textContent = email;
+                const buyAccessButton = document.createElement('button');
+                buyAccessButton.textContent = 'Buy Access';
+                buyAccessButton.className = 'btn btn-primary btn-small';
+                buyAccessButton.onclick = showPaymentForm;
+                document.querySelector('.user-account').appendChild(buyAccessButton);
             }
         }
     </script>
