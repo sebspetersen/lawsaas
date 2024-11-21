@@ -806,8 +806,20 @@
             selectCase(newCase.id);
         }
 
+        function getUserKey() {
+            const email = localStorage.getItem('userEmail');
+            return email ? `cases_${email}` : 'cases';
+        }
+
         function saveAndRenderCases() {
-            localStorage.setItem('cases', JSON.stringify(cases));
+            const userKey = getUserKey();
+            localStorage.setItem(userKey, JSON.stringify(cases));
+            renderCases();
+        }
+
+        function loadCases() {
+            const userKey = getUserKey();
+            cases = JSON.parse(localStorage.getItem(userKey)) || [];
             renderCases();
         }
 
@@ -941,8 +953,7 @@
         });
 
         document.addEventListener('DOMContentLoaded', () => {
-            cases = JSON.parse(localStorage.getItem('cases')) || [];
-            renderCases();
+            loadCases();
             checkAuth();
             updateUserInterface();
         });
