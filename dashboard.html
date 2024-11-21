@@ -857,7 +857,7 @@
                                 ${case_.status === 'active' ? 'Aktiv' : 'Afsluttet'}
                             </div>
                         </div>
-                        <button class="btn btn-secondary btn-small" onclick="deleteCase(event, ${case_.id})">Slet Chat</button>
+                        <button class="btn btn-secondary btn-small" onclick="event.stopPropagation(); deleteCase(${case_.id})">Slet Chat</button>
                     </div>
                 `).join('');
         }
@@ -982,14 +982,13 @@
             }
         }
 
-        function deleteCase(event, caseId) {
-            event.stopPropagation();
-
+        function deleteCase(caseId) {
             const caseIndex = cases.findIndex(c => c.id === caseId);
             if (caseIndex !== -1) {
                 cases.splice(caseIndex, 1);
                 saveAndRenderCases();
 
+                // If the deleted case was the current case, reset the chat interface
                 if (currentCaseId === caseId) {
                     currentCaseId = null;
                     document.getElementById('chat-interface').style.display = 'none';
