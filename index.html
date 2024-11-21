@@ -477,6 +477,48 @@
             50% { transform: scale(1.05); }
             100% { transform: scale(1); }
         }
+
+        .fun-button {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #fff;
+            background: linear-gradient(90deg, #00BFFF, #4169E1, #FF69B4, #FFD700);
+            padding: 0.75rem 1.5rem;
+            border-radius: 12px;
+            border: none;
+            cursor: pointer;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            position: relative;
+            overflow: hidden;
+            background-size: 400% 400%;
+        }
+
+        .fun-button:hover {
+            animation: colorShiftFast 1s infinite linear;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .fun-button:active {
+            transform: translateY(1px);
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .fun-button span {
+            display: inline-block;
+            transition: transform 0.3s ease;
+        }
+
+        .fun-button:hover span {
+            transform: translateX(5px);
+        }
+
+        @keyframes colorShiftFast {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
     </style>
 </head>
 <body>
@@ -499,7 +541,7 @@
             </div>
             
             <div class="hero-buttons">
-                <button class="btn btn-primary" onclick="window.location.href='dashboard.html'">Kom igang nu <span>→</span></button>
+                <button class="btn btn-primary fun-button" onclick="window.location.href='dashboard.html'">Kom igang nu <span>→</span></button>
             </div>
             <div class="stats-bar">
                 <div class="stat-item">
@@ -614,7 +656,7 @@
         <section class="cta-section">
             <h2 class="section-title">Kom i gang med DanLov i dag</h2>
             <div class="hero-buttons">
-                <button class="btn btn-primary" onclick="window.location.href='dashboard.html'">Kom igang nu <span>→</span></button>            </div>
+                <button class="btn btn-primary fun-button" onclick="window.location.href='dashboard.html'">Kom igang nu <span>→</span></button>            </div>
         </section>
     </main>
 
