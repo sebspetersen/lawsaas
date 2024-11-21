@@ -196,6 +196,25 @@
         .footer-section a:hover {
             text-decoration: underline;
         }
+
+        .highlight-effect {
+            font-size: 2rem;
+            font-weight: bold;
+            background: linear-gradient(90deg, #4169E1, #00BFFF);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: gradient-move 3s infinite;
+            margin-bottom: 24px;
+        }
+
+        @keyframes gradient-move {
+            0% {
+                background-position: 0% 50%;
+            }
+            100% {
+                background-position: 100% 50%;
+            }
+        }
     </style>
 </head>
 <body>
@@ -210,7 +229,7 @@
             <div class="hero-content">
                 <h1>Din <span class="highlight">Juridiske AI Assistent</span> er klar til at hjælpe 24/7</h1>
                 <p class="description">Få øjeblikkelige svar på alle dine juridiske spørgsmål. Fra kontrakter til selskabsret - din personlige juridiske ekspert er kun ét klik væk.</p>
-                <div class="price">Kun 39 DKK for 24 timers adgang</div>
+                <div class="price highlight-effect">Kun 39 DKK for 24 timers adgang</div>
                 <a href="/dashboard.html" class="cta">Start din juridiske rådgivning nu →</a>
                 
                 <div class="features">
