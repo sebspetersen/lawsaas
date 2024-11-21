@@ -896,6 +896,13 @@
             messagesContainer.appendChild(messageDiv);
             messagesContainer.scrollTop = messagesContainer.scrollHeight;
 
+            // Save the updated messages to localStorage
+            const selectedCase = cases.find(c => c.id === currentCaseId);
+            if (selectedCase) {
+                selectedCase.messages.push({ role, content });
+                saveAndRenderCases();
+            }
+
             return id;
         }
 
@@ -934,6 +941,8 @@
         });
 
         document.addEventListener('DOMContentLoaded', () => {
+            cases = JSON.parse(localStorage.getItem('cases')) || [];
+            renderCases();
             checkAuth();
             updateUserInterface();
         });
