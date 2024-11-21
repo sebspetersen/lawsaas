@@ -929,21 +929,12 @@
             
             const chatMessages = document.getElementById('chat-messages');
             chatMessages.innerHTML = '';
-
-            // Fetch chat messages from the server
-            fetch(`/api/chat/${caseId}`, {
-                headers: {
-                    'Authorization': `Bearer ${localStorage.getItem('authToken')}`
-                }
-            })
-            .then(response => response.json())
-            .then(messages => {
-                messages.forEach(msg => {
-                    addMessageToChat(msg.role, msg.content);
-                });
-            })
-            .catch(error => console.error('Error loading chat messages:', error));
-
+            
+            // Render existing messages without saving them again
+            selectedCase.messages.forEach(msg => {
+                addMessageToChat(msg.role, msg.content);
+            });
+            
             renderCases();
 
             if (window.innerWidth <= 768) {
