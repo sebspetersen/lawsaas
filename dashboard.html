@@ -983,11 +983,18 @@
         }
 
         function deleteCase(event, caseId) {
-            event.preventDefault();
+            event.stopPropagation();
+
             const caseIndex = cases.findIndex(c => c.id === caseId);
             if (caseIndex !== -1) {
                 cases.splice(caseIndex, 1);
                 saveAndRenderCases();
+
+                if (currentCaseId === caseId) {
+                    currentCaseId = null;
+                    document.getElementById('chat-interface').style.display = 'none';
+                    document.getElementById('no-case-selected').style.display = 'flex';
+                }
             }
         }
     </script>
