@@ -155,6 +155,47 @@
                 font-size: 2.5rem;
             }
         }
+
+        footer {
+            background-color: var(--gray);
+            padding: 40px 0;
+            margin-top: 60px;
+        }
+
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .footer-section {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .footer-section h4 {
+            color: var(--primary);
+            margin-bottom: 15px;
+        }
+
+        .footer-section ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .footer-section ul li {
+            margin-bottom: 10px;
+        }
+
+        .footer-section a {
+            color: var(--text);
+            text-decoration: none;
+        }
+
+        .footer-section a:hover {
+            text-decoration: underline;
+        }
     </style>
 </head>
 <body>
@@ -200,6 +241,37 @@
             </div>
         </main>
     </div>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>Virksomhedsoplysninger</h4>
+                    <ul>
+                        <li>KnoldenV</li>
+                        <li>CVR: 44976382</li>
+                        <li>Mølle Alle 6</li>
+                        <li>2500 København</li>
+                        <li>Email: Knoldenventures@gmail.com</li>
+                        <li>Tlf: +45 29 90 72 44</li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Juridisk</h4>
+                    <ul>
+                        <li><a href="/handelsbetingelser.html">Handelsbetingelser</a></li>
+                        <li><a href="/privatlivspolitik.html">Privatlivspolitik</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Om Tjenesten</h4>
+                    <p>DanLov er en AI-baseret juridisk assistenttjeneste. Vores svar er kun vejledende og erstatter ikke professionel juridisk rådgivning.</p>
+                    <p>Ved køb accepterer du at frasige dig 14-dages fortrydelsesretten, da tjenesten leveres øjeblikkeligt.</p>
+                    <p>Betaling behandles sikkert via Stripe. Efter betaling modtager du en e-mail med adgang til chatten.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
 
     <script>
         document.querySelector('.cta').addEventListener('click', (e) => {
