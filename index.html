@@ -519,7 +519,18 @@
             50% { background-position: 100% 50%; }
             100% { background-position: 0% 50%; }
         }
+
+        .payment-icons {
+            margin-top: 1rem;
+            text-align: center;
+        }
+
+        .payment-icons i {
+            margin: 0 0.5rem;
+            color: #fff; /* Adjust color as needed */
+        }
     </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
     <nav>
@@ -543,14 +554,22 @@
             <div class="hero-buttons">
                 <button class="btn btn-primary fun-button" onclick="window.location.href='dashboard.html'">Kom igang nu <span>→</span></button>
             </div>
+
+            <div class="payment-icons">
+                <i class="fab fa-apple-pay fa-2x"></i>
+                <i class="fab fa-cc-visa fa-2x"></i>
+                <i class="fab fa-cc-mastercard fa-2x"></i>
+                <i class="fab fa-cc-paypal fa-2x"></i>
+            </div>
+
             <div class="stats-bar">
                 <div class="stat-item">
                     <div class="stat-number">GPT-4o</div>
                     <div class="stat-label">mest avanceret AI model</div>
                 </div>
                 <div class="stat-item">
-                    <div class="stat-number">39 kr.</div>
-                    <div class="stat-label">Spar tid og penge</div>
+                    <div class="stat-number">GDPR-kompatibel</div>
+                    <div class="stat-label">Vi respekterer din data</div>
                 </div>
                 <div class="stat-item">
                     <div class="stat-number">24/7</div>
