@@ -539,7 +539,7 @@
             <div class="sidebar-header">
                 <h2 class="sidebar-title">Dine Sager</h2>
                 <button class="btn btn-icon btn-secondary" title="Filtrer sager">
-                    ��
+                    
                 </button>
             </div>
             <button onclick="createNewCase()" class="btn btn-primary">
@@ -857,6 +857,7 @@
                                 ${case_.status === 'active' ? 'Aktiv' : 'Afsluttet'}
                             </div>
                         </div>
+                        <button class="btn btn-secondary btn-small" onclick="deleteCase(event, ${case_.id})">Slet Chat</button>
                     </div>
                 `).join('');
         }
@@ -978,6 +979,15 @@
                 buyAccessButton.className = 'btn btn-primary btn-small';
                 buyAccessButton.onclick = showPaymentForm;
                 document.querySelector('.user-account').appendChild(buyAccessButton);
+            }
+        }
+
+        function deleteCase(event, caseId) {
+            event.preventDefault();
+            const caseIndex = cases.findIndex(c => c.id === caseId);
+            if (caseIndex !== -1) {
+                cases.splice(caseIndex, 1);
+                saveAndRenderCases();
             }
         }
     </script>
