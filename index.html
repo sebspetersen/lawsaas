@@ -455,6 +455,24 @@
                 display: block;
             }
         }
+
+        .price-highlight {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #fff;
+            background: linear-gradient(90deg, #4169E1, #00BFFF);
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            margin: 1.5rem 0;
+            display: inline-block;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
     </style>
 </head>
 <body>
@@ -471,10 +489,13 @@
         <section class="hero">
             <h1>Juridisk klarhed på sekunder</h1>
             <p>Din AI-drevne juridiske partner med øjeblikkelig adgang til dansk lovgivning og retspraksis. Få præcise svar og professionel vejledning døgnet rundt.</p>
+            
+            <div class="price-highlight">
+                Kun 39 DKK for 24 timers adgang
+            </div>
+            
             <div class="hero-buttons">
                 <button class="btn btn-primary" onclick="window.location.href='dashboard.html'">Kom igang nu <span>→</span></button>
-                <!-- Remove this button -->
-                <!-- <button class="btn btn-secondary">Se Demonstration</button> -->
             </div>
             <div class="stats-bar">
                 <div class="stat-item">
