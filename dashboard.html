@@ -539,7 +539,7 @@
             <div class="sidebar-header">
                 <h2 class="sidebar-title">Dine Sager</h2>
                 <button class="btn btn-icon btn-secondary" title="Filtrer sager">
-                    ⚡
+                    ��
                 </button>
             </div>
             <button onclick="createNewCase()" class="btn btn-primary">
@@ -861,28 +861,7 @@
                 `).join('');
         }
 
-        function selectCase(caseId) {
-            currentCaseId = caseId;
-            const selectedCase = cases.find(c => c.id === caseId);
-            
-            document.getElementById('no-case-selected').style.display = 'none';
-            document.getElementById('chat-interface').style.display = 'flex';
-            
-            const chatMessages = document.getElementById('chat-messages');
-            chatMessages.innerHTML = '';
-            
-            selectedCase.messages.forEach(msg => {
-                addMessage(msg.role, msg.content);
-            });
-            
-            renderCases();
-
-            if (window.innerWidth <= 768) {
-                document.getElementById('cases-sidebar').classList.remove('active');
-            }
-        }
-
-        function addMessage(role, content, isLoading = false) {
+        function addMessageToChat(role, content, isLoading = false) {
             const messagesContainer = document.getElementById('chat-messages');
             const messageDiv = document.createElement('div');
             const id = Date.now().toString();
@@ -908,14 +887,41 @@
             messagesContainer.appendChild(messageDiv);
             messagesContainer.scrollTop = messagesContainer.scrollHeight;
 
-            // Save the updated messages to localStorage
+            return id;
+        }
+
+        function addMessage(role, content) {
+            // Add message to the chat interface
+            addMessageToChat(role, content);
+
+            // Save the message to the current case's message history
             const selectedCase = cases.find(c => c.id === currentCaseId);
             if (selectedCase) {
                 selectedCase.messages.push({ role, content });
                 saveAndRenderCases();
             }
+        }
 
-            return id;
+        function selectCase(caseId) {
+            currentCaseId = caseId;
+            const selectedCase = cases.find(c => c.id === caseId);
+            
+            document.getElementById('no-case-selected').style.display = 'none';
+            document.getElementById('chat-interface').style.display = 'flex';
+            
+            const chatMessages = document.getElementById('chat-messages');
+            chatMessages.innerHTML = '';
+            
+            // Render existing messages without saving them again
+            selectedCase.messages.forEach(msg => {
+                addMessageToChat(msg.role, msg.content);
+            });
+            
+            renderCases();
+
+            if (window.innerWidth <= 768) {
+                document.getElementById('cases-sidebar').classList.remove('active');
+            }
         }
 
         function removeMessage(id) {
